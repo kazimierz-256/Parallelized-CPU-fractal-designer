@@ -10,162 +10,169 @@ using System.Windows.Media.Imaging;
 
 namespace Fractal_Designer
 {
-    class Algorithms
+    partial class Algorithms
     {
         public interface IFractalAlgorithm
         {
-            int maximumIterationCount { get; set; }
-            (Complex, int) Compute(Complex z);
+            (Complex, int, bool) Compute(Complex z);
+        }
+
+        public class KFractal : IFractalAlgorithm
+        {
+            int MaximumIterationCount;
+            double parameter;
+            double eps44 = Math.Pow(2, -44);
+            double eps11 = Math.Pow(2, -11);
+            double eps20 = Math.Pow(2, -20);
+            Func<Complex, Complex>[] Derivatives;
+
+            public (Complex, int, bool) Compute(Complex z)
+            {
+                int iterationsLeft = MaximumIterationCount;
+                Complex delta;
+                Complex zz, zzz, fz, fzz, fzzz;
+                zzz = z;
+                fzzz = Derivatives[0](z);
+
+                zz = z * (1 - eps11);
+                fzz = Derivatives[0](zz);
+
+                z = z - z * eps11 * fzz / (fzzz - fzz);
+                fz = Derivatives[0](z);
+
+                if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary))
+                    return (z, MaximumIterationCount - iterationsLeft, false);
+
+                do
+                {
+                    delta = fz / (parameter * ((fzz - fz) * (zzz - z) * (zzz - z) - (fzzz - fz) * (zz - z) * (zz - z)) / ((zz - z) * (zzz - z) * (zzz - zz)) + (1 - parameter) * (fzz - fz) / (zz - z));
+
+                    if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))
+                        return (z, MaximumIterationCount - iterationsLeft, false);
+
+                    zzz = zz;
+                    fzzz = fzz;
+                    zz = z;
+                    fzz = fz;
+                    z -= delta;
+                    fz = Derivatives[0](z);
+
+                } while (--iterationsLeft >= 0 && Complex.Abs(delta) > Math.Max(eps44, Complex.Abs(z) * eps20));
+
+                return (z, MaximumIterationCount - iterationsLeft, true);
+            }
+
+            public KFractal(int MaximumIterationCount, double parameter = 1, params Func<Complex, Complex>[] Derivatives)
+            {
+                this.MaximumIterationCount = MaximumIterationCount;
+                this.parameter = parameter;
+                this.Derivatives = Derivatives;
+            }
         }
 
         public class NewtonFractal : IFractalAlgorithm
         {
-            public int maximumIterationCount { get; set; } = 50;
-            static double eps44 = Math.Pow(2, -44);
-            static double eps10 = Math.Pow(2, -10);
+            int MaximumIterationCount;
+            double eps44 = Math.Pow(2, -44);
+            double eps20 = Math.Pow(2, -20);
+            double eps10 = Math.Pow(2, -10);
+            Func<Complex, Complex>[] Derivatives;
 
-            public (Complex, int) Compute(Complex z)
+            public (Complex, int, bool) Compute(Complex z)
             {
-                int iterationsLeft = maximumIterationCount;
+                int iterationsLeft = MaximumIterationCount;
                 Complex delta;
 
                 do
                 {
-                    delta = (z * z * z - 1) / (3 * z * z);
-                    z = z - delta;
-                } while (--iterationsLeft >= 0 && !double.IsNaN(z.Real) && !double.IsNaN(z.Imaginary) && Complex.Abs(delta) > Math.Max(eps44, Complex.Abs(z) * eps10));
-                return (z, maximumIterationCount - iterationsLeft);
+                    delta = Derivatives[0](z) / Derivatives[1](z);
+                    if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))
+                        return (z, MaximumIterationCount - iterationsLeft, false);
+                    z -= delta;
+                } while (--iterationsLeft >= 0 && Complex.Abs(delta) > Math.Max(eps44, Complex.Abs(z) * eps20));
+
+                return (z, MaximumIterationCount - iterationsLeft, true);
+            }
+
+            public NewtonFractal(int MaximumIterationCount, params Func<Complex, Complex>[] Derivatives)
+            {
+                this.MaximumIterationCount = MaximumIterationCount;
+                this.Derivatives = Derivatives;
             }
         }
 
-        public class IteratorSolver
+        public class FractalColourer
         {
             IFractalAlgorithm fractalAlgorithm;
 
-            public BitmapSource CreateBitmapSource(Complex center, double radiusReal, double radiusImaginary, int lengthReal, int lengthImaginary)
+            public BitmapSource CreateBitmapSource(Complex center, double radius, int lengthReal, int lengthImaginary)
             {
-                PixelFormat pf = PixelFormats.Bgr32;
-                int rawStride = (lengthReal * pf.BitsPerPixel + 7) / 8;
-                var rawImage = new byte[rawStride * lengthImaginary];
+                double eps10 = Math.Pow(2, -10);
+
+                PixelFormat pixelFormat = PixelFormats.Bgr32;
+                int stride = (lengthReal * pixelFormat.BitsPerPixel + 7) / 8;
+                var fractal = new byte[stride * lengthImaginary];
+
+                double radiusReal = radius;
+                double radiusImaginary = radius * lengthImaginary / lengthReal;
+
+
+                if (lengthReal < lengthImaginary)
+                {
+                    radiusReal = radius * lengthReal / lengthImaginary;
+                    radiusImaginary = radius;
+                }
 
                 Parallel.For(0, lengthReal, re =>
                 {
                     for (int im = 0; im < lengthImaginary; ++im)
                     {
-                        double realPosition = center.Real + (re * 2 - lengthReal) * radiusReal / lengthReal;
-                        double imaginaryPosition = center.Imaginary + (im * 2 - lengthImaginary) * radiusImaginary / lengthImaginary;
-                        (Complex z, int iterations) = fractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
+                        double realPosition = center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
+                        double imaginaryPosition = center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                        (Complex z, int iterations, bool succeeded) = fractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
 
                         (byte R, byte G, byte B) color;
 
-                        if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary) || double.IsInfinity(z.Real) || double.IsInfinity(z.Imaginary))
+                        if (!succeeded)
                         {
                             color = (0, 0, 0);
                         }
                         else
                         {
                             double abs = Complex.Abs(z);
-                            double hue = 180 * (z.Phase + Math.PI) / Math.PI;//(360/2) * ...
-                            double saturation = 500d / (500d + iterations * iterations) * (1 - Math.Pow(2, -10) / (Math.Pow(2, -10) + abs * abs));
-                            double value = 300d / (300d + iterations * iterations);
+                            double hue = 180d * (z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
+                            int iterationsSquared = iterations * iterations;
+                            double saturation = 500d / (500d + iterationsSquared) * (1 - eps10 / (eps10 + abs * abs));
+                            double value = 300d / (300d + iterationsSquared);
                             color = ColorFromHSV(hue, saturation, value);
                         }
 
-                        //*(p1 + (4 * (lengthReal * im + re) + 0)) = color.B;
-                        //*(p1 + (4 * (lengthReal * im + re) + 1)) = color.G;
-                        //*(p1 + (4 * (lengthReal * im + re) + 2)) = color.R;
-                        rawImage[4 * (lengthReal * im + re)] = color.B;
-                        rawImage[4 * (lengthReal * im + re) + 1] = color.G;
-                        rawImage[4 * (lengthReal * im + re) + 2] = color.R;
+                        fractal[4 * (lengthReal * im + re)] = color.B;
+                        fractal[4 * (lengthReal * im + re) + 1] = color.G;
+                        fractal[4 * (lengthReal * im + re) + 2] = color.R;
                     }
                 });
 
-                return BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pf, null, rawImage, rawStride);
+                return BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
             }
 
-            //public Complex[,] Solve(Complex center, double radiusReal, double radiusImaginary, int lengthReal, int lengthImaginary)
-            //{
-            //    var grid = new Complex[lengthReal, lengthImaginary];
-            //    double realPosition, imaginaryPosition;
-
-            //    Parallel.For(0, lengthReal, re =>
-            //    {
-            //        for (int im = 0; im < lengthImaginary; im++)
-            //        {
-            //            realPosition = center.Real + (re * 2 - lengthReal) * radiusReal / lengthReal;
-            //            imaginaryPosition = center.Imaginary + (im * 2 - lengthImaginary) * radiusImaginary / lengthImaginary;
-            //            grid[re, im] = new Complex(realPosition, imaginaryPosition);
-            //        }
-            //    });
-
-            //    return Solve(grid);
-            //}
-
-            //public Complex[,] Solve(Complex[,] grid)
-            //{
-            //    var outGrid = new Complex[grid.GetLength(0), grid.GetLength(1)];
-
-            //    Parallel.For(0, grid.GetLength(0), re =>
-            //    {
-            //        for (int im = 0; im < grid.GetLength(1); im++)
-            //            outGrid[re, im] = function(grid[re, im]);
-
-            //    });
-
-            //    return outGrid;
-            //}
-
-            public IteratorSolver(IFractalAlgorithm fractalAlgorithm)
+            public FractalColourer(IFractalAlgorithm fractalAlgorithm)
             {
                 this.fractalAlgorithm = fractalAlgorithm;
             }
 
         }
 
-        //public static BitmapSource ComplexToImage(Complex[,] grid)
-        //{
-        //    PixelFormat pf = PixelFormats.Bgr32;
-        //    int rawStride = (grid.GetLength(0) * pf.BitsPerPixel + 7) / 8;
-        //    var rawImage = new byte[rawStride * grid.GetLength(1)];
-
-        //    System.Drawing.Color color;
-
-        //    Parallel.For(0, grid.GetLength(0), re =>
-        //    {
-        //        for (int im = 0; im < grid.GetLength(1); ++im)
-        //        {
-        //            if (double.IsNaN(grid[re, im].Real) || double.IsNaN(grid[re, im].Imaginary) || double.IsInfinity(grid[re, im].Real) || double.IsInfinity(grid[re, im].Imaginary))
-        //            {
-        //                color = System.Drawing.Color.DarkOrchid;
-        //            }
-        //            else
-        //            {
-        //                double hue = 180 * (grid[re, im].Phase + Math.PI) / Math.PI;//(360/2) * ...
-        //                double saturation = 500d / (500d + 0) * (1 - Math.Pow(2, -10) / (Math.Pow(2, -10) + Complex.Abs(grid[re, im]) * Complex.Abs(grid[re, im])));
-        //                double value = 300d / (300d + 0);
-        //                color = ColorFromHSV(hue, saturation, value);
-        //            }
-
-        //            rawImage[4 * (grid.GetLength(0) * im + re) + 0] = color.B;
-        //            rawImage[4 * (grid.GetLength(0) * im + re) + 1] = color.G;
-        //            rawImage[4 * (grid.GetLength(0) * im + re) + 2] = color.R;
-
-        //        }
-        //    });
-
-        //    return BitmapSource.Create(grid.GetLength(0), grid.GetLength(1), 96, 96, pf, null, rawImage, rawStride);
-        //}
-
         public static (byte R, byte G, byte B) ColorFromHSV(double hue, double saturation, double value)
         {
-            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
-            double f = hue / 60 - Math.Floor(hue / 60);
+            var hi = (byte) ((int) (hue / 60) % 6);
+            double f = hue / 60 - (int) (hue / 60);
 
             value *= 255;
-            byte v = (byte) value;
-            byte p = (byte) (value * (1 - saturation));
-            byte q = (byte) (value * (1 - f * saturation));
-            byte t = (byte) (value * (1 - (1 - f) * saturation));
+            var v = (byte) value;
+            var p = (byte) (value * (1 - saturation));
+            var q = (byte) (value * (1 - f * saturation));
+            var t = (byte) (value * (1 - (1 - f) * saturation));
 
             if (hi == 0)
                 return (v, t, p);

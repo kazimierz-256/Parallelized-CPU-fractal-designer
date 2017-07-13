@@ -22,18 +22,68 @@ namespace Fractal_Designer
     /// </summary>
     public partial class MainWindow : Window
     {
+        SettingsWindow settingsWindow = null;
+        Settings programSettings = null;
+
+        Algorithms.FractalColourer solver;
+
         public MainWindow()
         {
             InitializeComponent();
+            Settings.Load(out programSettings);
+            settingsWindow = new SettingsWindow(programSettings, (newSettings) =>
+            {
+                programSettings = newSettings;
+                UpdateFractal();
+                Settings.Save(programSettings);
+            });
+            settingsWindow.Show();
+            // lookup on the internet how should the two cooperate in a good way
         }
+
+        Complex center = 0;
+        double radius = 20;
+
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            Fractal.Width = Width - 20;
+            Fractal.Height = Height - 20;
+            UpdateFractal();
+        }
+
+        private void UpdateFractal()
+        {
+            if (double.IsNaN(Fractal.Width) || double.IsNaN(Fractal.Height))
+                return;
+
             var sw = new Stopwatch();
             sw.Start();
-            var solver = new Algorithms.IteratorSolver(new Algorithms.NewtonFractal());
-            Fractal.Source = solver.CreateBitmapSource(0, 20, 20, (int) Fractal.Width, (int) Fractal.Height);
+
+            Func<Complex, Complex> function = z => z * (z - 1) * (z + 1) * (Complex.Abs(z) - 4);
+
+            Algorithms.IFractalAlgorithm algorithm = new Algorithms.KFractal(programSettings.iterations, (double) programSettings.parameter, function);
+
+            solver = new Algorithms.FractalColourer(algorithm);
+
+            Fractal.Source = solver.CreateBitmapSource(center, radius, (int) Fractal.Width / 4, (int) Fractal.Height / 4);
+
+            sw.Stop();
             Title = $"{sw.ElapsedMilliseconds} ms";
+        }
+
+        private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            double multiplier = Math.Pow(.5, e.Delta / 100);
+            radius *= Math.Max(multiplier, 1d / (1 << 10));
+            UpdateFractal();
+
+            Title += radius.ToString();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            settingsWindow?.Close();
         }
     }
 }
