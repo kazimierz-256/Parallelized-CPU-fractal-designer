@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <parameter>0.968478463298483</parameter>
-  <iterations>31</iterations>
+  <parameter>2.01526208902948</parameter>
+  <iterations>10</iterations>
 </Settings>

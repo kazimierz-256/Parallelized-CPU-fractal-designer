@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -51,9 +52,36 @@ namespace Fractal_Designer
         const string XsdPath = "../../Settings/Settings.xsd";
         public static void Load(out Settings programSettings)
         {
+            programSettings = null;
             var serializer = new XmlSerializer(typeof(Settings));
-            var xmlData = ValidateSettings(XmlPath);
-            programSettings = serializer.Deserialize(new StringReader(xmlData)) as Settings;
+
+            try
+            {
+                var xmlData = ValidateSettings(XmlPath);
+                programSettings = serializer.Deserialize(new StringReader(xmlData)) as Settings;
+            }
+            catch (Exception e)
+            {
+                var result = System.Windows.Forms.MessageBox.Show(
+                    $"Corrupt settings file. Retry?", $"{e.Message}",
+                    System.Windows.Forms.MessageBoxButtons.YesNo,
+                    System.Windows.Forms.MessageBoxIcon.Error);
+
+                if (result != System.Windows.Forms.DialogResult.Yes)
+                    Application.Current.Shutdown();
+
+                Save(default(Settings));
+                try
+                {
+                    var xmlData = ValidateSettings(XmlPath);
+                    programSettings = serializer.Deserialize(new StringReader(xmlData)) as Settings;
+                }
+                catch (Exception ee)
+                {
+                    System.Windows.Forms.MessageBox.Show("Could not fix the error.", "Please try removing the old settings file. The app could not self-fix. Exiting the application.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    Application.Current.Shutdown();
+                }
+            }
             // nicely communicate loading errors
         }
         public static void Save(Settings programSettings)

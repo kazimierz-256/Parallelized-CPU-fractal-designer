@@ -60,13 +60,13 @@ namespace Fractal_Designer
             var sw = new Stopwatch();
             sw.Start();
 
-            Func<Complex, Complex> function = z => z * (z - 1) * (z + 1) * (Complex.Abs(z) - 4);
+            Func<Complex, Complex> function = z => z * (z - 1) * (z + 1);
 
             Algorithms.IFractalAlgorithm algorithm = new Algorithms.KFractal(programSettings.iterations, (double) programSettings.parameter, function);
 
             solver = new Algorithms.FractalColourer(algorithm);
 
-            Fractal.Source = solver.CreateBitmapSource(center, radius, (int) Fractal.Width / 4, (int) Fractal.Height / 4);
+            Fractal.Source = solver.CreateBitmapSource(center, radius, (int) Fractal.Width, (int) Fractal.Height);
 
             sw.Stop();
             Title = $"{sw.ElapsedMilliseconds} ms";

@@ -19,7 +19,7 @@ namespace Fractal_Designer
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        private Action<Settings> UpdateFractalDelegate;
+        private event Action<Settings> UpdateFractalDelegate;
         private Settings programSettings;
 
         public SettingsWindow()
@@ -30,7 +30,7 @@ namespace Fractal_Designer
         public SettingsWindow(Settings programSettings, Action<Settings> UpdateFractalDelegate)
         {
             this.programSettings = programSettings;
-            this.UpdateFractalDelegate = UpdateFractalDelegate;
+            this.UpdateFractalDelegate += UpdateFractalDelegate;
 
             InitializeComponent();
 
@@ -48,7 +48,9 @@ namespace Fractal_Designer
 
             programSettings.parameter = (decimal) Parameter.Value;
 
-            UpdateFractalDelegate?.Invoke(programSettings);
+            // enumerate all settings
+
+            UpdateFractalDelegate(programSettings);
         }
     }
 }

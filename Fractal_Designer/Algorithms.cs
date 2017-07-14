@@ -116,7 +116,7 @@ namespace Fractal_Designer
                 double radiusReal = radius;
                 double radiusImaginary = radius * lengthImaginary / lengthReal;
 
-
+                // best-fit window, if in portrait mode
                 if (lengthReal < lengthImaginary)
                 {
                     radiusReal = radius * lengthReal / lengthImaginary;
@@ -127,29 +127,29 @@ namespace Fractal_Designer
                 {
                     for (int im = 0; im < lengthImaginary; ++im)
                     {
+                        // compute the location like in a grid (could be image-based but who wants it?)
                         double realPosition = center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
                         double imaginaryPosition = center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+
+                        // compute the end result
                         (Complex z, int iterations, bool succeeded) = fractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
 
-                        (byte R, byte G, byte B) color;
-
-                        if (!succeeded)
-                        {
-                            color = (0, 0, 0);
-                        }
-                        else
+                        if (succeeded)
                         {
                             double abs = Complex.Abs(z);
                             double hue = 180d * (z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
                             int iterationsSquared = iterations * iterations;
-                            double saturation = 500d / (500d + iterationsSquared) * (1 - eps10 / (eps10 + abs * abs));
-                            double value = 300d / (300d + iterationsSquared);
-                            color = ColorFromHSV(hue, saturation, value);
-                        }
+                            double saturation = 700d / (800d + iterationsSquared) * (1 - eps10 / (eps10 + abs * abs));
+                            double value = 180d / (200d + iterationsSquared);
 
-                        fractal[4 * (lengthReal * im + re)] = color.B;
-                        fractal[4 * (lengthReal * im + re) + 1] = color.G;
-                        fractal[4 * (lengthReal * im + re) + 2] = color.R;
+                            (byte R, byte G, byte B) color = ColorFromHSV(hue, saturation, value);
+
+                            fractal[4 * (lengthReal * im + re)] = color.B;
+                            fractal[4 * (lengthReal * im + re) + 1] = color.G;
+                            fractal[4 * (lengthReal * im + re) + 2] = color.R;
+                        }
+                        // else zeroes
+
                     }
                 });
 
@@ -158,6 +158,11 @@ namespace Fractal_Designer
 
             public FractalColourer(IFractalAlgorithm fractalAlgorithm)
             {
+                if (fractalAlgorithm == null)
+                {
+                    throw new ArgumentNullException("Brak algorytmu.");
+                }
+
                 this.fractalAlgorithm = fractalAlgorithm;
             }
 
