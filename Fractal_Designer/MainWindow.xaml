@@ -5,6 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fractal_Designer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel" Closing="Window_Closing">
-    <Image Name="Fractal" Stretch="UniformToFill"></Image>
+        Title="MainWindow" Height="600" Width="800" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+    <Grid x:Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!--what if it were a canvas?-->
+        <Image Grid.Row="0" Name="Fractal" Stretch="UniformToFill" MouseMove="Fractal_MouseMove" Width="370" Height="250">
+            <Image.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Move"/>
+                    <MenuItem Header="Apply Effect"/>
+                    <Separator />
+                    <MenuItem Header="Settings" Click="OpenSettings"/>
+                    <MenuItem Header="Exit" Click="Exit"/>
+                </ContextMenu>
+            </Image.ContextMenu>
+        </Image>
+
+        <StatusBar Grid.Row="1">
+            <TextBlock Name="Status"/>
+        </StatusBar>
+    </Grid>
 </Window>

@@ -19,23 +19,21 @@ namespace Fractal_Designer
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        private event Action<Settings> UpdateFractalDelegate;
-        private Settings programSettings;
+        private event Action UpdateFractalDelegate;
 
         public SettingsWindow()
         {
             InitializeComponent();
         }
 
-        public SettingsWindow(Settings programSettings, Action<Settings> UpdateFractalDelegate)
+        public SettingsWindow(Action UpdateFractalDelegate)
         {
-            this.programSettings = programSettings;
             this.UpdateFractalDelegate += UpdateFractalDelegate;
 
             InitializeComponent();
 
-            Iterations.Value = programSettings.iterations;
-            Parameter.Value = (double) programSettings.parameter;
+            Iterations.Value = Settings.Instance.iterations;
+            Parameter.Value = (double) Settings.Instance.parameter;
 
             Iterations.ValueChanged += UpdateFractal;
             Parameter.ValueChanged += UpdateFractal;
@@ -44,13 +42,13 @@ namespace Fractal_Designer
 
         private void UpdateFractal(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            programSettings.iterations = (ushort) Iterations.Value;
+            Settings.Instance.iterations = (ushort) Iterations.Value;
 
-            programSettings.parameter = (decimal) Parameter.Value;
+            Settings.Instance.parameter = (decimal) Parameter.Value;
 
             // enumerate all settings
 
-            UpdateFractalDelegate(programSettings);
+            UpdateFractalDelegate();
         }
     }
 }

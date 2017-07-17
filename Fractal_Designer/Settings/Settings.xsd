@@ -1,11 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:element name="Settings">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element name="parameter" type="xs:decimal" />
-        <xs:element name="iterations" type="xs:unsignedShort" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
+<xs:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified">
+  <xsd:element name="Settings">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="parameters">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element maxOccurs="unbounded"
+                           name="parameter"
+                           type="xsd:decimal" />
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="radius"
+                     type="xsd:decimal" />
+        <xsd:element name="centerreal"
+                     type="xsd:decimal" />
+        <xsd:element name="centerimaginary"
+                     type="xsd:decimal" />
+        <xsd:element name="parameter"
+                     type="xsd:decimal" />
+        <xsd:element name="iterations"
+                     type="xsd:unsignedShort" />
+        <xsd:element name="drageffect"
+                     type="xsd:string" />
+        <xsd:element name="algorithm"
+                     type="xsd:string" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
 </xs:schema>

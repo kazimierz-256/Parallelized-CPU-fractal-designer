@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <parameter>2.01526208902948</parameter>
-  <iterations>10</iterations>
+  <parameters>
+    <parameter>0.473684210526316</parameter>
+    <parameter>0.473684210526316</parameter>
+    <parameter>0.473684210526316</parameter>
+    <parameter>0.473684210526316</parameter>
+    <parameter>0.473684210526316</parameter>
+    <parameter>0.473684210526316</parameter>
+  </parameters>
+  <radius>16.24246</radius>
+  <centerreal>0.1236123</centerreal>
+  <centerimaginary>0.2616</centerimaginary>
+  <parameter>0.473684210526316</parameter>
+  <iterations>100</iterations>
+  <drageffect>none</drageffect>
+  <algorithm>kazimierz</algorithm>
 </Settings>

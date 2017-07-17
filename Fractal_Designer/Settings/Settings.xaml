@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fractal_Designer"
         mc:Ignorable="d"
-        Title="Settings" Height="300" Width="400" WindowStyle="ToolWindow" Topmost="True" ResizeMode="CanMinimize">
+        Title="Settings" Height="300" Width="400" WindowStyle="ToolWindow" ResizeMode="CanMinimize" WindowStartupLocation="CenterOwner">
     <!-- TabControl statusbar progressbar OkButton -->
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
@@ -18,6 +18,9 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
         <!--create a style-->
@@ -25,6 +28,9 @@
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">First parameter</Label>
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2">Second parameter</Label>
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3">Drag effect</Label>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4">Algorithm</Label>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5">Radius</Label>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="6">Center</Label>
 
         <!--BIND the values! -->
         <Slider VerticalAlignment="Center" Name="Iterations" Grid.Column="2" Grid.Row="0"  Minimum="0" Maximum="100" Ticks="100" Value="30"/>
@@ -42,11 +48,17 @@
         
         <!--redesign the system, i want to be able to move around while creating an effect!-->
         <!--isenabled binding-->
-        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" VerticalContentAlignment="Center" Margin="5">
+        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5">
             <ComboBoxItem IsSelected="True">None</ComboBoxItem>
             <ComboBoxItem>Double root</ComboBoxItem>
             <ComboBoxItem>Circular root</ComboBoxItem>
             <ComboBoxItem>Singularity</ComboBoxItem>
+        </ComboBox>
+        
+        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" VerticalContentAlignment="Center" Margin="5">
+            <ComboBoxItem IsSelected="True">Newton</ComboBoxItem>
+            <ComboBoxItem>Muller</ComboBoxItem>
+            <ComboBoxItem>Kazimierz</ComboBoxItem>
         </ComboBox>
         <!--<CheckBox Grid.Column="1" Grid.Row="4" MaxHeight="30" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Toggle drag effect"/>-->
     </Grid>
