@@ -12,13 +12,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <!--what if it were a canvas?-->
-        <Image Grid.Row="0" Name="Fractal" Stretch="UniformToFill" MouseMove="Fractal_MouseMove" Width="370" Height="250">
+        <!-- what if it were a canvas? -->
+        <!--wouldn't it be nice to compare side by side?-->
+        <Image Grid.Row="0" Name="Fractal" Stretch="UniformToFill" MouseMove="Fractal_MouseMove" MouseDown="Fractal_MouseDown" MouseUp="Fractal_MouseUp" MouseLeave="Fractal_MouseLeave" Width="370" Height="250" Cursor="Cross">
             <Image.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Move"/>
-                    <MenuItem Header="Apply Effect"/>
-                    <Separator />
                     <MenuItem Header="Settings" Click="OpenSettings"/>
                     <MenuItem Header="Exit" Click="Exit"/>
                 </ContextMenu>

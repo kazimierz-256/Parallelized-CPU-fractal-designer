@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,164 +17,188 @@ namespace Fractal_Designer
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
-    public partial class Settings
+    public partial class Settings : INotifyPropertyChanged
     {
 
-        private decimal[] parametersField;
+        private decimal radiusField = 1;
 
-        private decimal radiusField;
+        private decimal centerrealField = 0;
 
-        private decimal centerrealField;
+        private decimal centerimaginaryField = 0;
 
-        private decimal centerimaginaryField;
+        private decimal parameterField = 1;
 
-        private decimal parameterField;
+        private ushort iterationsField = 50;
 
-        private ushort iterationsField;
+        private ushort drageffectField = 0;
 
-        private string drageffectField;
+        private ushort algorithmField = 1;
 
-        private string algorithmField;
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("parameter", IsNullable = false)]
-        public decimal[] parameters
-        {
-            get
-            {
-                return this.parametersField;
-            }
-            set
-            {
-                this.parametersField = value;
-            }
-        }
-
-        /// <remarks/>
         public decimal radius
         {
-            get
-            {
-                return this.radiusField;
-            }
+            get => radiusField;
             set
             {
-                this.radiusField = value;
+                if (value == radiusField)
+                    return;
+
+                radiusField = value;
+                if (!loading)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("radius"));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
             }
         }
 
-        /// <remarks/>
         public decimal centerreal
         {
-            get
-            {
-                return this.centerrealField;
-            }
+            get => centerrealField;
             set
             {
-                this.centerrealField = value;
+                if (value == centerrealField)
+                    return;
+
+                centerrealField = value;
+                if (!loading)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerreal"));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
             }
         }
 
-        /// <remarks/>
         public decimal centerimaginary
         {
-            get
-            {
-                return this.centerimaginaryField;
-            }
+            get => centerimaginaryField;
             set
             {
-                this.centerimaginaryField = value;
+                if (value == centerimaginaryField)
+                    return;
+
+                centerimaginaryField = value;
+                if (!loading)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerimaginary"));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
             }
         }
 
-        /// <remarks/>
         public decimal parameter
         {
-            get
-            {
-                return this.parameterField;
-            }
+            get => parameterField;
             set
             {
-                this.parameterField = value;
+                if (value == parameterField)
+                    return;
+
+                parameterField = value;
+
+                if (!loading)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("parameter"));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
             }
         }
-
-        /// <remarks/>
+        
         public ushort iterations
         {
-            get
-            {
-                return this.iterationsField;
-            }
+            get => iterationsField;
             set
             {
-                this.iterationsField = value;
+                if (value == iterationsField)
+                    return;
+
+                iterationsField = value;
+
+                if (!loading)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("iterations"));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
+            }
+        }
+        
+        public ushort drageffect
+        {
+            get => drageffectField;
+            set
+            {
+                if (value == drageffectField)
+                    return;
+
+                drageffectField = value;
+
+                if (!loading)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("drageffect"));
+                    Save(this);
+                }
+            }
+        }
+        
+        public ushort algorithm
+        {
+            get => algorithmField;
+            set
+            {
+                if (value == algorithmField)
+                    return;
+
+                algorithmField = value;
+
+                if (!loading)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("algorithm"));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
             }
         }
 
-        /// <remarks/>
-        public string drageffect
-        {
-            get
-            {
-                return this.drageffectField;
-            }
-            set
-            {
-                this.drageffectField = value;
-            }
-        }
-
-        /// <remarks/>
-        public string algorithm
-        {
-            get
-            {
-                return this.algorithmField;
-            }
-            set
-            {
-                this.algorithmField = value;
-            }
-        }
     }
-
-
-
-
-
-
-
 
     public partial class Settings
     {
-        private static Settings instance = null;
+        public event PropertyChangedEventHandler PropertyChanged;
+        public static event Action Recompute;
+
+        private static Settings _Instance = null;
 
         public static Settings Instance
         {
             get
             {
-                if (instance == null)
+                if (_Instance == null)
                 {
-                    Load(out instance);
-                    return instance;
+                    Load();
+                    return _Instance;
                 }
                 else
-                    return instance;
+                    return _Instance;
 
             }
-            private set => instance = value;
+            private set => _Instance = value;
         }
 
         const string XmlPath = "../../Settings/Settings.xml";
         const string XsdPath = "../../Settings/Settings.xsd";
 
-        public static void Load(out Settings programSettings)
+        private static void Load() => Load(out _Instance);
+
+        private static bool loading = false;
+
+        private static void Load(out Settings programSettings)
         {
             programSettings = null;
+            loading = true;
             var serializer = new XmlSerializer(typeof(Settings));
 
             try
@@ -184,14 +209,16 @@ namespace Fractal_Designer
             catch (Exception e)
             {
                 var result = System.Windows.Forms.MessageBox.Show(
-                    $"Corrupt settings file. Retry?", $"{e.Message}",
+                    $"{e.Message}", $"Corrupt settings file. Try fixing?",
                     System.Windows.Forms.MessageBoxButtons.YesNo,
                     System.Windows.Forms.MessageBoxIcon.Error);
 
                 if (result != System.Windows.Forms.DialogResult.Yes)
                     Application.Current.Shutdown();
 
-                Save(default(Settings));
+
+                Save(new Settings());
+
                 try
                 {
                     var xmlData = ValidateSettings(XmlPath);
@@ -203,10 +230,16 @@ namespace Fractal_Designer
                     Application.Current.Shutdown();
                 }
             }
+            finally
+            {
+                loading = false;
+            }
             // nicely communicate loading errors
         }
 
-        public static void Save(Settings programSettings)
+        private static void Save() => Save(Instance);
+
+        private static void Save(Settings programSettings)
         {
             var serializer = new XmlSerializer(typeof(Settings), "settings");
             var writer = new StreamWriter(XmlPath);

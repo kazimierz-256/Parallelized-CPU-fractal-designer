@@ -10,12 +10,6 @@ using System.Windows.Media.Imaging;
 
 namespace Fractal_Designer
 {
-    public struct AlgorithmResult
-    {
-        public Complex z;
-        public int iterations;
-        public bool succeeded;
-    }
 
     public class FractalColourer
     {

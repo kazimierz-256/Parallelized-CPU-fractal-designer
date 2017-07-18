@@ -7,15 +7,7 @@
   <xsd:element name="Settings">
     <xsd:complexType>
       <xsd:sequence>
-        <xsd:element name="parameters">
-          <xsd:complexType>
-            <xsd:sequence>
-              <xsd:element maxOccurs="unbounded"
-                           name="parameter"
-                           type="xsd:decimal" />
-            </xsd:sequence>
-          </xsd:complexType>
-        </xsd:element>
+        
         <xsd:element name="radius"
                      type="xsd:decimal" />
         <xsd:element name="centerreal"
@@ -27,9 +19,9 @@
         <xsd:element name="iterations"
                      type="xsd:unsignedShort" />
         <xsd:element name="drageffect"
-                     type="xsd:string" />
+                     type="xsd:unsignedShort" />
         <xsd:element name="algorithm"
-                     type="xsd:string" />
+                     type="xsd:unsignedShort" />
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>

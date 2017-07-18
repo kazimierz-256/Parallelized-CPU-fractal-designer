@@ -13,12 +13,23 @@ namespace Fractal_Designer
         int MaximumIterationCount { get; set; }
         ComplexFunction[] Derivatives { get; set; }
     }
-
+    
+    public interface IParametrizedAlgorithm
+    {
+        double Parameter { get; set; }
+    }
 
     public interface IFractalFactory
     {
-        IFractalAlgorithm GetAlgorithmByName(string algorithmName,int MaximumIterationCount, params ComplexFunction[] Derivatives);
+        IFractalAlgorithm GetAutoConfiguredAlgorithmByID(ushort algorithmID, params ComplexFunction[] Derivatives);
     }
 
     public delegate Complex ComplexFunction(Complex z);
+
+    public struct AlgorithmResult
+    {
+        public Complex z;
+        public int iterations;
+        public bool succeeded;
+    }
 }

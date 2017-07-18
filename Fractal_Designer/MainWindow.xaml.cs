@@ -22,12 +22,19 @@ namespace Fractal_Designer
     /// </summary>
     public partial class MainWindow : Window
     {
-        SettingsWindow settingsWindow = null;
+        bool effect = false;
         FractalColourer colourer;
+        SettingsWindow settingsWindow = null;
+        ComplexFunction function = z => Complex.Cos(z) - 7;
+        // odwrotna notacja polska zaimplementować
+
 
         public MainWindow()
         {
             InitializeComponent();
+
+            Settings.Recompute += RecomputeFractal;
+
             // lookup on the internet how should the two cooperate in a good way
         }
 
@@ -35,15 +42,39 @@ namespace Fractal_Designer
         // or make it a canvas!
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e) => RecomputeFractal();
 
-        private void RecomputeFractal()
+        private void RecomputeFractal() => RecomputeFractal(GetComplexCoords(Mouse.GetPosition(Fractal)));
+
+        private void RecomputeFractal(Complex complexCoordinates)
         {
             if (Settings.Instance == null || double.IsNaN(Fractal.ActualWidth) || double.IsNaN(Fractal.ActualHeight) || Fractal.Width == 0 || Fractal.Height == 0)
                 return;
+            // also move the center!
+            var algorithmFunction = function;
 
-            ComplexFunction function = z => z * (z - 1) * (z + 1) * (z - 2) * (z + 2) * (z - 4) * (z + 4);
+            if (effect && Settings.Instance.drageffect > 0)
+            {
+                switch (Settings.Instance.drageffect)
+                {
+                    case 1:
+                        algorithmFunction = z => function(z) * (z - complexCoordinates);
+                        break;
+                    case 2:
+                        algorithmFunction = z => function(z) * (z - complexCoordinates) * (z - complexCoordinates);
+                        break;
+                    case 3:
+                        algorithmFunction = z => function(z) * (z.Magnitude - complexCoordinates.Magnitude);
+                        break;
+                    case 4:
+                        algorithmFunction = z => function(z) / (z - complexCoordinates);
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             var fractalFactory = new ComplexFractalFactory();
-            colourer = new FractalColourer(fractalFactory.GetAlgorithmByName(Settings.Instance.algorithm, (int) Settings.Instance.iterations, function));
+
+            colourer = new FractalColourer(fractalFactory.GetAutoConfiguredAlgorithmByID(Settings.Instance.algorithm, algorithmFunction));
 
             var sw = new Stopwatch();
             sw.Start();
@@ -59,28 +90,22 @@ namespace Fractal_Designer
         {
             double multiplier = Math.Pow(.5, e.Delta / 100);
 
-            Settings.Instance.radius = (decimal) (((double) Settings.Instance.radius) * Math.Max(multiplier, 1d / (1 << 10)));
+            var radius = (decimal) (((double) Settings.Instance.radius) * Math.Max(multiplier, 1d / (1 << 10)));
 
-            if (Settings.Instance.radius == 0)
+            if (radius == 0)
             {
-                Settings.Instance.radius = 1;
+                radius = 1;
             }
 
-            RecomputeFractal();
-            Settings.Save(Settings.Instance);
+            Settings.Instance.radius = radius;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) => settingsWindow?.Close();
 
-        private void Fractal_MouseMove(object sender, MouseEventArgs e)
+        private Complex GetComplexCoords(Point point)
         {
-            var point = Mouse.GetPosition(Fractal);
             int re = (int) point.X;
             int im = (int) point.Y;
-            if (re < 0 || im < 0 || re >= colourer.results.GetLength(0) || im >= colourer.results.GetLength(1))
-                return;
-
-            var result = colourer.results[re, im];
 
             int lengthReal = (int) Fractal.ActualWidth;
             int lengthImaginary = (int) Fractal.ActualHeight;
@@ -94,19 +119,38 @@ namespace Fractal_Designer
             }
             double realPosition = ((double) Settings.Instance.centerreal) + (re * 2d - lengthReal) / lengthReal * radiusReal;
             double imaginaryPosition = ((double) Settings.Instance.centerimaginary) + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+            return new Complex(realPosition, imaginaryPosition);
+        }
 
-            Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z.Real} + i{result.z.Imaginary}, Mouse=[{point.X}, {point.Y}], Position={realPosition} + i{imaginaryPosition}";
+        private void Fractal_MouseMove(object sender, MouseEventArgs e)
+        {
+            var point = Mouse.GetPosition(Fractal);
+            var complexCoordinates = GetComplexCoords(point);
+            int re = (int) point.X;
+            int im = (int) point.Y;
+            if (re < 0 || im < 0 || re >= colourer.results.GetLength(0) || im >= colourer.results.GetLength(1))
+                return;
+
+            if (effect)
+                RecomputeFractal(complexCoordinates);
+
+            var result = colourer.results[re, im];
+
+            if (result.succeeded)
+                Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z}, f(Result)={function(result.z)}, Position={complexCoordinates}";
+            else
+                Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations} (fail), Position={complexCoordinates}";
         }
 
         private void OpenSettings(object sender, RoutedEventArgs e)
         {
             if (settingsWindow == null || !settingsWindow.IsLoaded)
             {
-                settingsWindow = new SettingsWindow(() =>
+                settingsWindow = new SettingsWindow()
                 {
-                    RecomputeFractal();
-                    Settings.Save(Settings.Instance);
-                });
+                    Owner = this
+                };
+
                 settingsWindow.Show();
             }
             else
@@ -114,5 +158,15 @@ namespace Fractal_Designer
         }
 
         private void Exit(object sender, RoutedEventArgs e) => Close();
+
+        private void Fractal_MouseLeave(object sender, MouseEventArgs e)
+        {
+            effect = false;
+            Status.Text = "";
+        }
+
+        private void Fractal_MouseUp(object sender, MouseButtonEventArgs e) => effect = false;
+
+        private void Fractal_MouseDown(object sender, MouseButtonEventArgs e) => effect = true;
     }
 }

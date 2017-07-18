@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fractal_Designer"
         mc:Ignorable="d"
-        Title="Settings" Height="300" Width="400" WindowStyle="ToolWindow" ResizeMode="CanMinimize" WindowStartupLocation="CenterOwner">
+        x:Name="_this"
+        Title="Settings" Height="300" Width="400" WindowStyle="ToolWindow" ResizeMode="CanMinimize" WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
     <!-- TabControl statusbar progressbar OkButton -->
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
@@ -18,47 +19,39 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
         </Grid.RowDefinitions>
 
         <!--create a style-->
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">Iterations</Label>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">First parameter</Label>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2">Second parameter</Label>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3">Drag effect</Label>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4">Algorithm</Label>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="5">Radius</Label>
-        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="6">Center</Label>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">Main parameter</Label>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2">Drag effect</Label>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3">Algorithm</Label>
+
+        <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Content="{Binding Path=iterations}"/>
+        <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Content="{Binding Path=parameter}"/>
 
         <!--BIND the values! -->
-        <Slider VerticalAlignment="Center" Name="Iterations" Grid.Column="2" Grid.Row="0"  Minimum="0" Maximum="100" Ticks="100" Value="30"/>
-        <Slider VerticalAlignment="Center" Name="Parameter"  Grid.Column="2" Grid.Row="1" Minimum="-1" Maximum="3" TickFrequency="10000" Value="1"/>
-        <Slider VerticalAlignment="Center" Name="Parameter2"  Grid.Column="2" Grid.Row="2" Minimum="-1" Maximum="3" TickFrequency="10000" Value="1"/>
+        <Slider VerticalAlignment="Center" Name="Iterations" Grid.Column="2" Grid.Row="0"  Minimum="0" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding Path=iterations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Slider VerticalAlignment="Center" Name="Parameter"  Grid.Column="2" Grid.Row="1" Minimum="-1" Maximum="3" TickFrequency="0.1" IsSnapToTickEnabled="True" Value="{Binding Path=parameter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center">123</Label>
-        <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center">-1.23</Label>
-        <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="2" VerticalAlignment="Center">0.456</Label>
 
         <!--<ComboBox MaxHeight="30" Grid.Column="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5">
             <ComboBoxItem IsSelected="True">Move the complex plane</ComboBoxItem>
             <ComboBoxItem>Create an effect</ComboBoxItem>
         </ComboBox>-->
-        
-        <!--redesign the system, i want to be able to move around while creating an effect!-->
-        <!--isenabled binding-->
-        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5">
-            <ComboBoxItem IsSelected="True">None</ComboBoxItem>
+
+        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=drageffect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBoxItem>Move</ComboBoxItem>
+            <ComboBoxItem>Single root</ComboBoxItem>
             <ComboBoxItem>Double root</ComboBoxItem>
             <ComboBoxItem>Circular root</ComboBoxItem>
             <ComboBoxItem>Singularity</ComboBoxItem>
         </ComboBox>
-        
-        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="4" VerticalContentAlignment="Center" Margin="5">
-            <ComboBoxItem IsSelected="True">Newton</ComboBoxItem>
-            <ComboBoxItem>Muller</ComboBoxItem>
+ <!--SelectedIndex="{Binding Path=algorithm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource index2name}}"-->
+        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=algorithm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBoxItem>Newton</ComboBoxItem>
             <ComboBoxItem>Kazimierz</ComboBoxItem>
+            <ComboBoxItem>Muller</ComboBoxItem>
         </ComboBox>
         <!--<CheckBox Grid.Column="1" Grid.Row="4" MaxHeight="30" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Toggle drag effect"/>-->
     </Grid>
