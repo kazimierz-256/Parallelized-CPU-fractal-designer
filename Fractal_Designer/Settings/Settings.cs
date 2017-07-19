@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,7 +20,6 @@ namespace Fractal_Designer
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
     public partial class Settings : INotifyPropertyChanged
     {
-
         private decimal radiusField = 1;
 
         private decimal centerrealField = 0;
@@ -43,7 +43,7 @@ namespace Fractal_Designer
                     return;
 
                 radiusField = value;
-                if (!loading)
+                if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("radius"));
                     Recompute?.Invoke();
@@ -61,7 +61,7 @@ namespace Fractal_Designer
                     return;
 
                 centerrealField = value;
-                if (!loading)
+                if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerreal"));
                     Recompute?.Invoke();
@@ -79,11 +79,34 @@ namespace Fractal_Designer
                     return;
 
                 centerimaginaryField = value;
-                if (!loading)
+                if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerimaginary"));
                     Recompute?.Invoke();
                     Save(this);
+                }
+            }
+        }
+
+        [XmlIgnore]
+        public Complex center
+        {
+            get => new Complex((double) Instance.centerreal, (double) Instance.centerimaginary);
+            set
+            {
+                if ((decimal) value.Real == Instance.centerrealField && (decimal) value.Imaginary == Instance.centerimaginaryField)
+                    return;
+
+                Instance.centerrealField = (decimal) value.Real;
+                Instance.centerimaginary = (decimal) value.Imaginary;
+
+
+                if (!ForbidRefresh)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerreal"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerimaginary"));
+                    Recompute?.Invoke();
+                    Save();
                 }
             }
         }
@@ -98,7 +121,7 @@ namespace Fractal_Designer
 
                 parameterField = value;
 
-                if (!loading)
+                if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("parameter"));
                     Recompute?.Invoke();
@@ -106,7 +129,7 @@ namespace Fractal_Designer
                 }
             }
         }
-        
+
         public ushort iterations
         {
             get => iterationsField;
@@ -117,7 +140,7 @@ namespace Fractal_Designer
 
                 iterationsField = value;
 
-                if (!loading)
+                if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("iterations"));
                     Recompute?.Invoke();
@@ -125,7 +148,7 @@ namespace Fractal_Designer
                 }
             }
         }
-        
+
         public ushort drageffect
         {
             get => drageffectField;
@@ -136,14 +159,14 @@ namespace Fractal_Designer
 
                 drageffectField = value;
 
-                if (!loading)
+                if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("drageffect"));
                     Save(this);
                 }
             }
         }
-        
+
         public ushort algorithm
         {
             get => algorithmField;
@@ -154,7 +177,7 @@ namespace Fractal_Designer
 
                 algorithmField = value;
 
-                if (!loading)
+                if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("algorithm"));
                     Recompute?.Invoke();
@@ -191,15 +214,28 @@ namespace Fractal_Designer
         const string XmlPath = "../../Settings/Settings.xml";
         const string XsdPath = "../../Settings/Settings.xsd";
 
+        public void Reset()
+        {
+            radius = 1;
+            center = 0;
+            parameter = 1;
+            iterations = 50;
+            drageffect = 0;
+            algorithm = 1;
+        }
+
         private static void Load() => Load(out _Instance);
 
-        private static bool loading = false;
+        private static bool ForbidRefresh = false;
+        private static bool ForbidSaving = false;
 
         private static void Load(out Settings programSettings)
         {
             programSettings = null;
-            loading = true;
+            bool workOffline = false;
             var serializer = new XmlSerializer(typeof(Settings));
+
+            ForbidRefresh = true;
 
             try
             {
@@ -209,13 +245,15 @@ namespace Fractal_Designer
             catch (Exception e)
             {
                 var result = System.Windows.Forms.MessageBox.Show(
-                    $"{e.Message}", $"Corrupt settings file. Try fixing?",
+                    $"{e.Message}", $"Missing or corrupt settings file. Try fixing?",
                     System.Windows.Forms.MessageBoxButtons.YesNo,
                     System.Windows.Forms.MessageBoxIcon.Error);
 
                 if (result != System.Windows.Forms.DialogResult.Yes)
-                    Application.Current.Shutdown();
-
+                {
+                    workOffline = true;
+                    programSettings = new Settings();
+                }
 
                 Save(new Settings());
 
@@ -226,21 +264,26 @@ namespace Fractal_Designer
                 }
                 catch (Exception ee)
                 {
-                    System.Windows.Forms.MessageBox.Show("Could not fix the error.", $"Please try removing the old settings file. {ee.InnerException} Exiting the application.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    Application.Current.Shutdown();
+                    System.Windows.Forms.MessageBox.Show("Could not self-fix. Working offline.", $"Please try removing the old settings file. {ee.InnerException} Working without persistent settings.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                    workOffline = true;
+                    programSettings = new Settings();
                 }
             }
             finally
             {
-                loading = false;
+                ForbidRefresh = false;
+                ForbidSaving = workOffline;
             }
-            // nicely communicate loading errors
         }
 
         private static void Save() => Save(Instance);
 
         private static void Save(Settings programSettings)
         {
+            if (ForbidSaving)
+                return;
+
             var serializer = new XmlSerializer(typeof(Settings), "settings");
             var writer = new StreamWriter(XmlPath);
             serializer.Serialize(writer, programSettings);

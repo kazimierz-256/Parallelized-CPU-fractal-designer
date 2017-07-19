@@ -62,8 +62,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Algorithms\ComputeFractal.cs" />
     <Compile Include="Algorithms\FractalAlgorithms.cs" />
     <Compile Include="Algorithms\Interfaces.cs" />
+    <Compile Include="Algorithms\ThreadWork.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Settings\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>

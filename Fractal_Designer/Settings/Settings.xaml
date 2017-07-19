@@ -19,6 +19,7 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
         <!--create a style-->
@@ -26,6 +27,7 @@
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">Main parameter</Label>
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2">Drag effect</Label>
         <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3">Algorithm</Label>
+        <Label HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4">Reset all settings</Label>
 
         <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Content="{Binding Path=iterations}"/>
         <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Content="{Binding Path=parameter}"/>
@@ -34,12 +36,6 @@
         <Slider VerticalAlignment="Center" Name="Iterations" Grid.Column="2" Grid.Row="0"  Minimum="0" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding Path=iterations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <Slider VerticalAlignment="Center" Name="Parameter"  Grid.Column="2" Grid.Row="1" Minimum="-1" Maximum="3" TickFrequency="0.1" IsSnapToTickEnabled="True" Value="{Binding Path=parameter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-
-        <!--<ComboBox MaxHeight="30" Grid.Column="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5">
-            <ComboBoxItem IsSelected="True">Move the complex plane</ComboBoxItem>
-            <ComboBoxItem>Create an effect</ComboBoxItem>
-        </ComboBox>-->
-
         <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=drageffect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ComboBoxItem>Move</ComboBoxItem>
             <ComboBoxItem>Single root</ComboBoxItem>
@@ -47,12 +43,16 @@
             <ComboBoxItem>Circular root</ComboBoxItem>
             <ComboBoxItem>Singularity</ComboBoxItem>
         </ComboBox>
- <!--SelectedIndex="{Binding Path=algorithm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource index2name}}"-->
+        
         <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=algorithm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ComboBoxItem>Newton</ComboBoxItem>
             <ComboBoxItem>Kazimierz</ComboBoxItem>
             <ComboBoxItem>Muller</ComboBoxItem>
         </ComboBox>
-        <!--<CheckBox Grid.Column="1" Grid.Row="4" MaxHeight="30" Margin="5" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Toggle drag effect"/>-->
+
+        <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Click="Reset">
+            Defaults
+        </Button>
+        
     </Grid>
 </Window>

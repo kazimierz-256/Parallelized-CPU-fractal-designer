@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace Fractal_Designer
 {
@@ -22,6 +24,12 @@ namespace Fractal_Designer
     public interface IFractalFactory
     {
         IFractalAlgorithm GetAutoConfiguredAlgorithmByID(ushort algorithmID, params ComplexFunction[] Derivatives);
+    }
+
+    public interface IFractalColourer
+    {
+        IFractalAlgorithm FractalAlgorithm { get; set; }
+        (BitmapSource, AlgorithmResult[,]) GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token);
     }
 
     public delegate Complex ComplexFunction(Complex z);

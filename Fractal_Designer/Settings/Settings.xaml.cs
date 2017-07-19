@@ -26,5 +26,7 @@ namespace Fractal_Designer
             DataContext = Settings.Instance;
             InitializeComponent();
         }
+
+        private void Reset(object sender, RoutedEventArgs e) => Settings.Instance.Reset();
     }
 }

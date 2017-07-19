@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <radius>128</radius>
+  <radius>1</radius>
   <centerreal>0</centerreal>
   <centerimaginary>0</centerimaginary>
   <parameter>1</parameter>
-  <iterations>200</iterations>
-  <drageffect>1</drageffect>
-  <algorithm>2</algorithm>
+  <iterations>50</iterations>
+  <drageffect>0</drageffect>
+  <algorithm>1</algorithm>
 </Settings>

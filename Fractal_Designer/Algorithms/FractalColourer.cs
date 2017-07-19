@@ -4,27 +4,25 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Fractal_Designer
 {
-
-    public class FractalColourer
+    public class FractalColourer : IFractalColourer
     {
-        IFractalAlgorithm fractalAlgorithm;
+        public IFractalAlgorithm FractalAlgorithm { get; set; }
 
-        public AlgorithmResult[,] results;
-
-        public BitmapSource CreateBitmapSource(Complex center, double radius, int lengthReal, int lengthImaginary)
+        public (BitmapSource, AlgorithmResult[,]) GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken())
         {
             double eps10 = Math.Pow(2, -10);
 
             PixelFormat pixelFormat = PixelFormats.Bgr32;
             int stride = (lengthReal * pixelFormat.BitsPerPixel + 7) / 8;
             var fractal = new byte[stride * lengthImaginary];
-            results = new AlgorithmResult[lengthReal, lengthImaginary];
+            var results = new AlgorithmResult[lengthReal, lengthImaginary];
 
             double radiusReal = radius;
             double radiusImaginary = radius * lengthImaginary / lengthReal;
@@ -36,22 +34,27 @@ namespace Fractal_Designer
                 radiusImaginary = radius;
             }
 
-            Parallel.For(0, lengthReal, re =>
+            Parallel.For(0, lengthReal, (re, loopstate) =>
             {
+                if (token.IsCancellationRequested)
+                {
+                    loopstate.Stop();
+                    return;
+                }
                 for (int im = 0; im < lengthImaginary; ++im)
                 {
-                        // compute the location like in a grid (could be image-based but who wants it?)
-                        double realPosition = center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
+                    // compute the location like in a grid (could be image-based but who wants it?)
+                    double realPosition = center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
                     double imaginaryPosition = center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
 
-                        // compute the end result
-                        results[re, im] = fractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
+                    // compute the end result
+                    results[re, im] = FractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
 
                     if (results[re, im].succeeded)
                     {
                         double abs = results[re, im].z.Magnitude;
                         double hue = 180d * (results[re, im].z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
-                            int iterationsSquared = results[re, im].iterations * results[re, im].iterations;
+                        int iterationsSquared = results[re, im].iterations * results[re, im].iterations;
                         double saturation = 700d / (800d + iterationsSquared) * (1 - eps10 / (eps10 + abs * abs));
                         double value = 180d / (200d + iterationsSquared);
 
@@ -61,15 +64,20 @@ namespace Fractal_Designer
                         fractal[4 * (lengthReal * im + re) + 1] = color.G;
                         fractal[4 * (lengthReal * im + re) + 2] = color.R;
                     }
-                        // else zeroes
+                    // else zeroes
 
-                    }
+                }
             });
 
-            return BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
+            if (token.IsCancellationRequested)
+                return (null, null);
+
+            var bitmap = BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
+            bitmap.Freeze();
+            return (bitmap, results);
         }
 
-        public FractalColourer(IFractalAlgorithm fractalAlgorithm) => this.fractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
+        public FractalColourer(IFractalAlgorithm fractalAlgorithm) => this.FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
 
         private static (byte R, byte G, byte B) ColorFromHSV(double hue, double saturation, double value)
         {
