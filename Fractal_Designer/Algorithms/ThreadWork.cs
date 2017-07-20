@@ -34,7 +34,7 @@ namespace Fractal_Designer
             {
                 double parallelThreshold = 9;
 
-                foreach (var divisor in new double[] { 128, 64, 9, 3, 1, .5 })
+                foreach (var divisor in new double[] { 243, 81, 27, 9, 3, 1, .5 })
                     GetBitmapAndReport(divisor, divisor <= parallelThreshold);
 
             }, token.Token).ContinueWith(new Action<Task>(t => t.Dispose()), token.Token);
@@ -66,7 +66,6 @@ namespace Fractal_Designer
                     {
                         lock (Fractal)
                         {
-
                             Fractal.Source = result.bitmap;
                             Fractal.Tag = result;
 
@@ -85,10 +84,6 @@ namespace Fractal_Designer
         //    a();
         //    sw.Stop();
         //    Title = $"Computed in {sw.Elapsed.Milliseconds}ms ({sw.Elapsed.Ticks} ts)";
-        //    if (sw.Elapsed.Milliseconds > 500)
-        //    {
-
-        //    }
         //    return sw.Elapsed;
         //}
     }

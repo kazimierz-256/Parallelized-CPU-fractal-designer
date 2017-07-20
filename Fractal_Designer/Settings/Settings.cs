@@ -16,7 +16,7 @@ namespace Fractal_Designer
     public enum Algorithm
     {
         Newton,
-        Kazimierz, 
+        Kazimierz,
         Muller
     }
 
@@ -52,8 +52,8 @@ namespace Fractal_Designer
             private set => _Instance = value;
         }
 
-        const string XmlPath = "../../Settings/Settings.xml";
-        const string XsdPath = "../../Settings/Settings.xsd";
+        static Uri XmlPath = new Uri("../../Settings/Settings.xml", UriKind.Relative);
+        static Uri XsdPath = new Uri("../../Settings/Settings.xsd", UriKind.Relative);
 
         public void Reset()
         {
@@ -64,12 +64,12 @@ namespace Fractal_Designer
             drageffect = 0;
             algorithm = 1;
         }
-
-        private static void Load() => Load(out _Instance);
-
+        
         private static bool ForbidRefresh = false;
         private static bool ForbidSaving = false;
+        private static bool IsSaving = false;
 
+        private static void Load() => Load(out _Instance);
         private static void Load(out Settings programSettings)
         {
             programSettings = null;
@@ -85,18 +85,21 @@ namespace Fractal_Designer
             }
             catch (Exception e)
             {
-                var result = System.Windows.Forms.MessageBox.Show(
-                    $"{e.Message}", $"Missing or corrupt settings file. Try fixing?",
-                    System.Windows.Forms.MessageBoxButtons.YesNo,
-                    System.Windows.Forms.MessageBoxIcon.Error);
-
-                if (result != System.Windows.Forms.DialogResult.Yes)
+                if (File.Exists(XmlPath.ToString()))
                 {
-                    workOffline = true;
-                    programSettings = new Settings();
+                    var result = System.Windows.Forms.MessageBox.Show(
+                                $"{e.Message}", $"Existing yet corrupt settings file. Try fixing?",
+                                System.Windows.Forms.MessageBoxButtons.YesNo,
+                                System.Windows.Forms.MessageBoxIcon.Error);
+
+                    if (result != System.Windows.Forms.DialogResult.Yes)
+                    {
+                        workOffline = true;
+                        programSettings = new Settings();
+                    }
                 }
 
-                Save(new Settings());
+                Save(new Settings(), true);
 
                 try
                 {
@@ -105,7 +108,7 @@ namespace Fractal_Designer
                 }
                 catch (Exception ee)
                 {
-                    System.Windows.Forms.MessageBox.Show("Could not self-fix. Working offline.", $"Please try removing the old settings file. {ee.InnerException} Working without persistent settings.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    System.Windows.Forms.MessageBox.Show("Could not fix settings file.", $"Please try removing the old settings file. {ee.InnerException} Working without persistent settings.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
 
                     workOffline = true;
                     programSettings = new Settings();
@@ -119,22 +122,34 @@ namespace Fractal_Designer
         }
 
         private static void Save() => Save(Instance);
-
-        private static void Save(Settings programSettings)
+        private static void Save(Settings programSettings, bool saveImmediately = false)
         {
-            if (ForbidSaving)
+            if (ForbidSaving || (IsSaving && !saveImmediately))
                 return;
 
-            var serializer = new XmlSerializer(typeof(Settings), "settings");
-            var writer = new StreamWriter(XmlPath);
-            serializer.Serialize(writer, programSettings);
-            writer.Close();
+            if (saveImmediately)
+            {
+                var serializer = new XmlSerializer(typeof(Settings));
+                var writer = new StreamWriter(XmlPath.ToString());
+                serializer.Serialize(writer, programSettings);
+                writer.Close();
+            }
+            else
+            {
+                IsSaving = true;
+                Task.Factory.StartNew(() =>
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    Save(programSettings, true);
+                    IsSaving = false;
+                });
+            }
         }
 
-        private static string ValidateSettings(string xmlFilename)
+        private static string ValidateSettings(Uri xmlFilename)
         {
-            var xmlData = File.ReadAllText(xmlFilename);
-            var xsdData = File.ReadAllText(XsdPath);
+            var xmlData = File.ReadAllText(xmlFilename.ToString());
+            var xsdData = File.ReadAllText(XsdPath.ToString());
             var document = XDocument.Parse(xmlData);
             var schemaSet = new XmlSchemaSet();
 
@@ -328,5 +343,5 @@ namespace Fractal_Designer
         }
 
     }
-    
+
 }
