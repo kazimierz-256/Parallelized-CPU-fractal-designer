@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -15,51 +16,80 @@ namespace Fractal_Designer
     partial class MainWindow
     {
         Stack<CancellationTokenSource> tokens = new Stack<CancellationTokenSource>();
-        IProgress<(BitmapSource, AlgorithmResult[,])> progress;
-        Task t;
+        ulong currentTaskID = 0;
 
-        private void AsyncDraw(FractalColourer colourer, Complex center, double radius, int width, int height)
+        private void AsyncDraw(AlgorithmProcessor colourer, Complex center, double radius, int width, int height)
         {
             if (tokens.Count > 0 && !tokens.Peek().IsCancellationRequested)
+            {
                 tokens.Peek().Cancel();
+                //tokens.Peek().Dispose();
+                ++currentTaskID;
+            }
 
-            var currentToken = new CancellationTokenSource();
+            var token = new CancellationTokenSource();
+            tokens.Push(token);
 
-            tokens.Push(currentToken);
-
-            progress = new Progress<(BitmapSource bitmap, AlgorithmResult[,] information)>(result =>
+            Task.Factory.StartNew(() =>
             {
-                if (result.bitmap != null)
-                {
-                    Fractal.Source = result.bitmap;
-                    Fractal.Tag = result.information;
-                }
-            });
+                double parallelThreshold = 9;
 
-            t = Task.Factory.StartNew(() =>
+                foreach (var divisor in new double[] { 128, 64, 9, 3, 1, .5 })
+                    GetBitmapAndReport(divisor, divisor <= parallelThreshold);
+
+            }, token.Token).ContinueWith(new Action<Task>(t => t.Dispose()), token.Token);
+
+            void GetBitmapAndReport(double divisor, bool parallel)
             {
-                DoWork(currentToken.Token, colourer, center, radius, width, height);
-            }, currentToken.Token);
-        }
+                if (token.IsCancellationRequested)
+                    return;
 
-        private void DoWork(CancellationToken token, FractalColourer colourer, Complex center, double radius, int width, int height)
-        {
-            var divisors = new List<double> { 100, 20, 4, 2, 1, .5 };
-            foreach (var divisor in divisors)
-            {
-                int newWindth = (int) (width / divisor);
-                int newHeight = (int) (height / divisor);
-
-                if (newWindth == 0 || newHeight == 0)
-                    continue;
-
-                var bs = colourer.GetBitmapSourceFromComplexGrid(center, radius, newWindth, newHeight, token);
+                var result = colourer.GetBitmapSourceFromComplexGrid(center, radius, (int) (width / divisor), (int) (height / divisor), token.Token, parallel);
 
                 if (token.IsCancellationRequested)
                     return;
 
-                progress.Report(bs);
-            }
-        }
+                if (result.bitmap != null)
+                {
+                    result.taskID = currentTaskID;
+                    result.timesSmaller = divisor;
+
+                    Report(result);
+                }
+            }// end GetBitmapAndReport
+
+            void Report(BitmapSourceResult result)
+            {
+                Fractal.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (!token.IsCancellationRequested && (Fractal.Tag == null || result.taskID != ((BitmapSourceResult) Fractal.Tag).taskID || result.timesSmaller < ((BitmapSourceResult) Fractal.Tag).timesSmaller))
+                    {
+                        lock (Fractal)
+                        {
+
+                            Fractal.Source = result.bitmap;
+                            Fractal.Tag = result;
+
+                            Title = $"#{result.timesSmaller} times smaller ({result.taskID})";
+                        }
+                    }
+
+                }), System.Windows.Threading.DispatcherPriority.Render);
+            }// end Report
+        }// end AsyncDraw
+
+        //private TimeSpan Measure(Action a)
+        //{
+        //    var sw = new Stopwatch();
+        //    sw.Start();
+        //    a();
+        //    sw.Stop();
+        //    Title = $"Computed in {sw.Elapsed.Milliseconds}ms ({sw.Elapsed.Ticks} ts)";
+        //    if (sw.Elapsed.Milliseconds > 500)
+        //    {
+
+        //    }
+        //    return sw.Elapsed;
+        //}
     }
 }

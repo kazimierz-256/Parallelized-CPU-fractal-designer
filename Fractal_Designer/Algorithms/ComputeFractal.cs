@@ -11,8 +11,8 @@ namespace Fractal_Designer
 {
     partial class MainWindow
     {
-        FractalColourer Colourer;
-        ComplexFunction Function = z => z * z * z - 2;
+        AlgorithmProcessor Colourer;
+        ComplexFunction Function = z => Complex.Cosh(z) - 2;
         ComplexFunction AlgorithmFunction;
 
         private Complex GetComplexCoords(Point point)
@@ -37,21 +37,21 @@ namespace Fractal_Designer
 
         private void ComputeFractal(Complex complexCoordinates)
         {
-            switch (Settings.Instance.drageffect)
+            switch ((DragEffect) Settings.Instance.drageffect)
             {
-                case 0:
+                case DragEffect.Move:
                     Settings.Instance.center += MouseLastClickComplex - complexCoordinates;
                     break;
-                case 1:
+                case DragEffect.SingleRoot:
                     AlgorithmFunction = z => Function(z) * (z - complexCoordinates);
                     break;
-                case 2:
-                    AlgorithmFunction = z => Function(z) * (z - complexCoordinates) * (z - complexCoordinates) * (z - complexCoordinates);
+                case DragEffect.DoubleRoot:
+                    AlgorithmFunction = z => Function(z) * (z - complexCoordinates) * (z - complexCoordinates);
                     break;
-                case 3:
+                case DragEffect.CircularRoot:
                     AlgorithmFunction = z => Function(z) * (z.Magnitude - complexCoordinates.Magnitude);
                     break;
-                case 4:
+                case DragEffect.Singularity:
                     AlgorithmFunction = z => Function(z) / (z - complexCoordinates);
                     break;
                 default:
@@ -66,7 +66,7 @@ namespace Fractal_Designer
                 return;
 
             var fractalFactory = new ComplexFractalFactory();
-            Colourer = new FractalColourer(fractalFactory.GetAutoConfiguredAlgorithmByID(Settings.Instance.algorithm, AlgorithmFunction ?? Function));
+            Colourer = new AlgorithmProcessor(fractalFactory.GetAutoConfiguredAlgorithmByID((Algorithm) Settings.Instance.algorithm, AlgorithmFunction ?? Function));
 
             AsyncDraw(Colourer, Settings.Instance.center, (double) Settings.Instance.radius, (int) Fractal.Width, (int) Fractal.Height);
 

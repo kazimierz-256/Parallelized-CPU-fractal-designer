@@ -36,19 +36,11 @@
         <Slider VerticalAlignment="Center" Name="Iterations" Grid.Column="2" Grid.Row="0"  Minimum="0" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding Path=iterations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <Slider VerticalAlignment="Center" Name="Parameter"  Grid.Column="2" Grid.Row="1" Minimum="-1" Maximum="3" TickFrequency="0.1" IsSnapToTickEnabled="True" Value="{Binding Path=parameter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=drageffect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <ComboBoxItem>Move</ComboBoxItem>
-            <ComboBoxItem>Single root</ComboBoxItem>
-            <ComboBoxItem>Double root</ComboBoxItem>
-            <ComboBoxItem>Circular root</ComboBoxItem>
-            <ComboBoxItem>Singularity</ComboBoxItem>
-        </ComboBox>
-        
-        <ComboBox MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=algorithm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <ComboBoxItem>Newton</ComboBoxItem>
-            <ComboBoxItem>Kazimierz</ComboBoxItem>
-            <ComboBoxItem>Muller</ComboBoxItem>
-        </ComboBox>
+        <ComboBox Name="DragEffectComboBox"  MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=drageffect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+
+        <ComboBox Name="AlgorithmComboBox" MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="3" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=algorithm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
 
         <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" Click="Reset">
             Defaults

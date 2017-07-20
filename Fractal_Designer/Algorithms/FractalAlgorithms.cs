@@ -9,19 +9,19 @@ namespace Fractal_Designer
 {
     class ComplexFractalFactory : IFractalFactory
     {
-        public IFractalAlgorithm GetAutoConfiguredAlgorithmByID(ushort algorithmID, params ComplexFunction[] Derivatives)
+        public IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params ComplexFunction[] Derivatives)
         {
             IFractalAlgorithm algorithm;
 
             switch (algorithmID)
             {
-                case 0 when Derivatives.Length >= 2:
+                case Algorithm.Newton when Derivatives.Length >= 2:
                     algorithm = new NewtonFractal();
                     break;
-                case 1 when Derivatives.Length >= 1:
+                case Algorithm.Kazimierz when Derivatives.Length >= 1:
                     algorithm = new KazimierzFractal();
                     break;
-                case 2 when Derivatives.Length >= 1:
+                case Algorithm.Muller when Derivatives.Length >= 1:
                     algorithm = new MullerFractal();
                     break;
                 default:
@@ -69,7 +69,7 @@ namespace Fractal_Designer
             zz = z * (1 - eps11);
             fzz = Derivatives[0](zz);
 
-            zz = z - z * eps11 * fzz / (fzzz - fzz);
+            zz = zzz - zzz * (zzz - zz) * fzz / (fzzz - fzz);
             fzz = Derivatives[0](zz);
 
             z = zz - zz * (zzz - zz) * fzz / (fzzz - fzz);
@@ -165,6 +165,12 @@ namespace Fractal_Designer
             z = zzz - (zzz - zz) * fzz / (fzzz - fzz);
             fz = Derivatives[0](z);
 
+            // newton-alike
+            //z = zz;
+            //fz = fzz;
+            //zz = zzz;
+            //fzz = fzzz;
+
             iterationsLeft -= 2;
 
             if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary))
@@ -172,6 +178,9 @@ namespace Fractal_Designer
 
             do
             {
+                // newton-alike
+                //delta = z * eps11 * fz / (fz - Derivatives[0](z * (1 - eps11)));
+
                 delta = fz / (Parameter * ((fzz - fz) * (zzz - z) * (zzz - z) - (fzzz - fz) * (zz - z) * (zz - z)) / ((zz - z) * (zzz - z) * (zzz - zz)) + (1 - Parameter) * (fzz - fz) / (zz - z));
 
                 if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))

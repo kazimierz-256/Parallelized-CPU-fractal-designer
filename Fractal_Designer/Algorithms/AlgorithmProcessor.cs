@@ -11,12 +11,17 @@ using System.Windows.Media.Imaging;
 
 namespace Fractal_Designer
 {
-    public class FractalColourer : IFractalColourer
+    public class AlgorithmProcessor : IAlgorithmProcessor
     {
         public IFractalAlgorithm FractalAlgorithm { get; set; }
 
-        public (BitmapSource, AlgorithmResult[,]) GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken())
+        public AlgorithmProcessor(IFractalAlgorithm fractalAlgorithm) => this.FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
+
+        public BitmapSourceResult GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken(), bool parallel = false)
         {
+            if (lengthReal == 0 || lengthImaginary == 0)
+                return new BitmapSourceResult { bitmap = null, results = null };
+
             double eps10 = Math.Pow(2, -10);
 
             PixelFormat pixelFormat = PixelFormats.Bgr32;
@@ -34,18 +39,38 @@ namespace Fractal_Designer
                 radiusImaginary = radius;
             }
 
-            Parallel.For(0, lengthReal, (re, loopstate) =>
+            if (parallel)
             {
-                if (token.IsCancellationRequested)
+                Parallel.For(0, lengthReal, (re, loopstate) =>
                 {
-                    loopstate.Stop();
-                    return;
+                    if (token.IsCancellationRequested)
+                        loopstate.Break();
+                    else
+                        ComputeRow(re);
+                });
+            }
+            else
+            {
+                for (int re = 0; re < lengthReal; ++re)
+                {
+                    if (token.IsCancellationRequested)
+                        return new BitmapSourceResult { bitmap = null, results = null };
+
+                    ComputeRow(re);
                 }
+            }
+
+            var bitmap = BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
+            bitmap.Freeze();
+            return new BitmapSourceResult { bitmap = bitmap, results = results };
+
+            void ComputeRow(int re)
+            {
                 for (int im = 0; im < lengthImaginary; ++im)
                 {
                     // compute the location like in a grid (could be image-based but who wants it?)
-                    double realPosition = center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
-                    double imaginaryPosition = center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                    double realPosition = center.Real + ((re + .5) * 2d - lengthReal) / lengthReal * radiusReal;
+                    double imaginaryPosition = center.Imaginary + ((im + .5) * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
 
                     // compute the end result
                     results[re, im] = FractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
@@ -67,17 +92,8 @@ namespace Fractal_Designer
                     // else zeroes
 
                 }
-            });
-
-            if (token.IsCancellationRequested)
-                return (null, null);
-
-            var bitmap = BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
-            bitmap.Freeze();
-            return (bitmap, results);
+            }
         }
-
-        public FractalColourer(IFractalAlgorithm fractalAlgorithm) => this.FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
 
         private static (byte R, byte G, byte B) ColorFromHSV(double hue, double saturation, double value)
         {

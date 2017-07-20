@@ -17,6 +17,8 @@
             <Image.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Settings" Click="OpenSettings"/>
+                    <MenuItem Header="Export"/>
+                    <Separator/>
                     <MenuItem Header="Exit" Click="Exit"/>
                 </ContextMenu>
             </Image.ContextMenu>

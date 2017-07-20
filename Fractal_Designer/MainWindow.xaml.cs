@@ -61,7 +61,7 @@ namespace Fractal_Designer
 
             int re = (int) MouseLastMoved.X;
             int im = (int) MouseLastMoved.Y;
-            var results = ((sender as Image).Tag as AlgorithmResult[,]);
+            var results = ((BitmapSourceResult) (sender as Image).Tag).results;
             if (results == null || re < 0 || im < 0 || re >= results.GetLength(0) || im >= results.GetLength(1))
                 return;
 

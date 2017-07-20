@@ -23,16 +23,24 @@ namespace Fractal_Designer
 
     public interface IFractalFactory
     {
-        IFractalAlgorithm GetAutoConfiguredAlgorithmByID(ushort algorithmID, params ComplexFunction[] Derivatives);
+        IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params ComplexFunction[] Derivatives);
     }
 
-    public interface IFractalColourer
+    public interface IAlgorithmProcessor
     {
         IFractalAlgorithm FractalAlgorithm { get; set; }
-        (BitmapSource, AlgorithmResult[,]) GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token);
+        BitmapSourceResult GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token, bool parallel);
     }
 
     public delegate Complex ComplexFunction(Complex z);
+
+    public struct BitmapSourceResult
+    {
+        public BitmapSource bitmap;
+        public AlgorithmResult[,] results;
+        public ulong taskID;
+        public double timesSmaller;
+    }
 
     public struct AlgorithmResult
     {

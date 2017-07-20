@@ -13,6 +13,147 @@ using System.Xml.Serialization;
 
 namespace Fractal_Designer
 {
+    public enum Algorithm
+    {
+        Newton,
+        Kazimierz, 
+        Muller
+    }
+
+    public enum DragEffect
+    {
+        Move,
+        SingleRoot,
+        DoubleRoot,
+        CircularRoot,
+        Singularity
+    }
+
+    public partial class Settings
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public static event Action Recompute;
+
+        private static Settings _Instance = null;
+
+        public static Settings Instance
+        {
+            get
+            {
+                if (_Instance == null)
+                {
+                    Load();
+                    return _Instance;
+                }
+                else
+                    return _Instance;
+
+            }
+            private set => _Instance = value;
+        }
+
+        const string XmlPath = "../../Settings/Settings.xml";
+        const string XsdPath = "../../Settings/Settings.xsd";
+
+        public void Reset()
+        {
+            radius = 1;
+            center = 0;
+            parameter = 1;
+            iterations = 50;
+            drageffect = 0;
+            algorithm = 1;
+        }
+
+        private static void Load() => Load(out _Instance);
+
+        private static bool ForbidRefresh = false;
+        private static bool ForbidSaving = false;
+
+        private static void Load(out Settings programSettings)
+        {
+            programSettings = null;
+            bool workOffline = false;
+            var serializer = new XmlSerializer(typeof(Settings));
+
+            ForbidRefresh = true;
+
+            try
+            {
+                var xmlData = ValidateSettings(XmlPath);
+                programSettings = serializer.Deserialize(new StringReader(xmlData)) as Settings;
+            }
+            catch (Exception e)
+            {
+                var result = System.Windows.Forms.MessageBox.Show(
+                    $"{e.Message}", $"Missing or corrupt settings file. Try fixing?",
+                    System.Windows.Forms.MessageBoxButtons.YesNo,
+                    System.Windows.Forms.MessageBoxIcon.Error);
+
+                if (result != System.Windows.Forms.DialogResult.Yes)
+                {
+                    workOffline = true;
+                    programSettings = new Settings();
+                }
+
+                Save(new Settings());
+
+                try
+                {
+                    var xmlData = ValidateSettings(XmlPath);
+                    programSettings = serializer.Deserialize(new StringReader(xmlData)) as Settings;
+                }
+                catch (Exception ee)
+                {
+                    System.Windows.Forms.MessageBox.Show("Could not self-fix. Working offline.", $"Please try removing the old settings file. {ee.InnerException} Working without persistent settings.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+
+                    workOffline = true;
+                    programSettings = new Settings();
+                }
+            }
+            finally
+            {
+                ForbidRefresh = false;
+                ForbidSaving = workOffline;
+            }
+        }
+
+        private static void Save() => Save(Instance);
+
+        private static void Save(Settings programSettings)
+        {
+            if (ForbidSaving)
+                return;
+
+            var serializer = new XmlSerializer(typeof(Settings), "settings");
+            var writer = new StreamWriter(XmlPath);
+            serializer.Serialize(writer, programSettings);
+            writer.Close();
+        }
+
+        private static string ValidateSettings(string xmlFilename)
+        {
+            var xmlData = File.ReadAllText(xmlFilename);
+            var xsdData = File.ReadAllText(XsdPath);
+            var document = XDocument.Parse(xmlData);
+            var schemaSet = new XmlSchemaSet();
+
+            schemaSet.Add(XmlSchema.Read(new StringReader(xsdData), (o, e) =>
+            {
+                if (e.Exception != null)
+                    throw e.Exception;
+            }));
+
+            document.Validate(schemaSet, (o, e) =>
+            {
+                if (e.Severity == XmlSeverityType.Error)
+                    throw e.Exception;
+            });
+
+            return xmlData;
+        }
+    }
+
     /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -187,130 +328,5 @@ namespace Fractal_Designer
         }
 
     }
-
-    public partial class Settings
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public static event Action Recompute;
-
-        private static Settings _Instance = null;
-
-        public static Settings Instance
-        {
-            get
-            {
-                if (_Instance == null)
-                {
-                    Load();
-                    return _Instance;
-                }
-                else
-                    return _Instance;
-
-            }
-            private set => _Instance = value;
-        }
-
-        const string XmlPath = "../../Settings/Settings.xml";
-        const string XsdPath = "../../Settings/Settings.xsd";
-
-        public void Reset()
-        {
-            radius = 1;
-            center = 0;
-            parameter = 1;
-            iterations = 50;
-            drageffect = 0;
-            algorithm = 1;
-        }
-
-        private static void Load() => Load(out _Instance);
-
-        private static bool ForbidRefresh = false;
-        private static bool ForbidSaving = false;
-
-        private static void Load(out Settings programSettings)
-        {
-            programSettings = null;
-            bool workOffline = false;
-            var serializer = new XmlSerializer(typeof(Settings));
-
-            ForbidRefresh = true;
-
-            try
-            {
-                var xmlData = ValidateSettings(XmlPath);
-                programSettings = serializer.Deserialize(new StringReader(xmlData)) as Settings;
-            }
-            catch (Exception e)
-            {
-                var result = System.Windows.Forms.MessageBox.Show(
-                    $"{e.Message}", $"Missing or corrupt settings file. Try fixing?",
-                    System.Windows.Forms.MessageBoxButtons.YesNo,
-                    System.Windows.Forms.MessageBoxIcon.Error);
-
-                if (result != System.Windows.Forms.DialogResult.Yes)
-                {
-                    workOffline = true;
-                    programSettings = new Settings();
-                }
-
-                Save(new Settings());
-
-                try
-                {
-                    var xmlData = ValidateSettings(XmlPath);
-                    programSettings = serializer.Deserialize(new StringReader(xmlData)) as Settings;
-                }
-                catch (Exception ee)
-                {
-                    System.Windows.Forms.MessageBox.Show("Could not self-fix. Working offline.", $"Please try removing the old settings file. {ee.InnerException} Working without persistent settings.", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-
-                    workOffline = true;
-                    programSettings = new Settings();
-                }
-            }
-            finally
-            {
-                ForbidRefresh = false;
-                ForbidSaving = workOffline;
-            }
-        }
-
-        private static void Save() => Save(Instance);
-
-        private static void Save(Settings programSettings)
-        {
-            if (ForbidSaving)
-                return;
-
-            var serializer = new XmlSerializer(typeof(Settings), "settings");
-            var writer = new StreamWriter(XmlPath);
-            serializer.Serialize(writer, programSettings);
-            writer.Close();
-        }
-
-        private static string ValidateSettings(string xmlFilename)
-        {
-            var xmlData = File.ReadAllText(xmlFilename);
-            var xsdData = File.ReadAllText(XsdPath);
-            var document = XDocument.Parse(xmlData);
-            var schemaSet = new XmlSchemaSet();
-
-            schemaSet.Add(XmlSchema.Read(new StringReader(xsdData), (o, e) =>
-            {
-                if (e.Exception != null)
-                    throw e.Exception;
-            }));
-
-            document.Validate(schemaSet, (o, e) =>
-            {
-                if (e.Severity == XmlSeverityType.Error)
-                    throw e.Exception;
-            });
-
-            return xmlData;
-        }
-    }
-
+    
 }

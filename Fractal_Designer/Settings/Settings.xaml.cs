@@ -25,6 +25,16 @@ namespace Fractal_Designer
         {
             DataContext = Settings.Instance;
             InitializeComponent();
+
+            foreach (var DragEffectName in Enum.GetNames(typeof(DragEffect)))
+            {
+                DragEffectComboBox.Items.Add(new ComboBoxItem() { Content = DragEffectName });
+            }
+
+            foreach (var AlgorithmName in Enum.GetNames(typeof(Algorithm)))
+            {
+                AlgorithmComboBox.Items.Add(new ComboBoxItem() { Content = AlgorithmName });
+            }
         }
 
         private void Reset(object sender, RoutedEventArgs e) => Settings.Instance.Reset();
