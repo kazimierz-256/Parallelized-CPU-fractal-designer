@@ -11,9 +11,10 @@ namespace Fractal_Designer
 {
     partial class MainWindow
     {
+        IComplexFunction Function = new ClassicComplexFunction(z => z);
+        IComplexFunction AlgorithmFunction;
+        Complex? lastComplexCoordinates;
         AlgorithmProcessor Colourer;
-        ComplexFunction Function = z => Complex.Cosh(z) - 2;
-        ComplexFunction AlgorithmFunction;
 
         private Complex GetComplexCoords(Point point)
         {
@@ -43,20 +44,21 @@ namespace Fractal_Designer
                     Settings.Instance.center += MouseLastClickComplex - complexCoordinates;
                     break;
                 case DragEffect.SingleRoot:
-                    AlgorithmFunction = z => Function(z) * (z - complexCoordinates);
+                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) * (z - complexCoordinates));
                     break;
                 case DragEffect.DoubleRoot:
-                    AlgorithmFunction = z => Function(z) * (z - complexCoordinates) * (z - complexCoordinates);
+                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) * (z - complexCoordinates) * (z - complexCoordinates));
                     break;
                 case DragEffect.CircularRoot:
-                    AlgorithmFunction = z => Function(z) * (z.Magnitude - complexCoordinates.Magnitude);
+                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) * (z.Magnitude - complexCoordinates.Magnitude));
                     break;
                 case DragEffect.Singularity:
-                    AlgorithmFunction = z => Function(z) / (z - complexCoordinates);
+                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) / (z - complexCoordinates));
                     break;
                 default:
                     break;
             }
+
             ComputeFractal();
         }
 
@@ -72,6 +74,8 @@ namespace Fractal_Designer
 
             Status.Text = $"Radius={(double) Settings.Instance.radius}";
         }
+
+        private void RecomputeFractal() => ComputeFractal();
 
     }
 }

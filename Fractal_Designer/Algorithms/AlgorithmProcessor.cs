@@ -69,8 +69,8 @@ namespace Fractal_Designer
                 for (int im = 0; im < lengthImaginary; ++im)
                 {
                     // compute the location like in a grid (could be image-based but who wants it?)
-                    double realPosition = center.Real + ((re + .5) * 2d - lengthReal) / lengthReal * radiusReal;
-                    double imaginaryPosition = center.Imaginary + ((im + .5) * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                    double realPosition = center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
+                    double imaginaryPosition = center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
 
                     // compute the end result
                     results[re, im] = FractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));

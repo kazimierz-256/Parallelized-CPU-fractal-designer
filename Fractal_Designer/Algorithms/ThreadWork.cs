@@ -23,7 +23,7 @@ namespace Fractal_Designer
             if (tokens.Count > 0 && !tokens.Peek().IsCancellationRequested)
             {
                 tokens.Peek().Cancel();
-                //tokens.Peek().Dispose();
+                tokens.Peek().Dispose();
                 ++currentTaskID;
             }
 
@@ -69,7 +69,7 @@ namespace Fractal_Designer
                             Fractal.Source = result.bitmap;
                             Fractal.Tag = result;
 
-                            Title = $"#{result.timesSmaller} times smaller ({result.taskID})";
+                            Status.Text = $"#{result.timesSmaller} times smaller ({result.taskID})";
                         }
                     }
 

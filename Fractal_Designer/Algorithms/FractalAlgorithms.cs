@@ -9,7 +9,7 @@ namespace Fractal_Designer
 {
     class ComplexFractalFactory : IFractalFactory
     {
-        public IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params ComplexFunction[] Derivatives)
+        public IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params IComplexFunction[] Derivatives)
         {
             IFractalAlgorithm algorithm;
 
@@ -42,7 +42,7 @@ namespace Fractal_Designer
     internal class NullAlgorithm : IFractalAlgorithm
     {
         public int MaximumIterationCount { get; set; }
-        public ComplexFunction[] Derivatives { get; set; }
+        public IComplexFunction[] Derivatives { get; set; }
 
         public AlgorithmResult Compute(Complex z) => new AlgorithmResult() { succeeded = false };
     }
@@ -53,7 +53,7 @@ namespace Fractal_Designer
         double eps11 = Math.Pow(2, -11);
         double eps20 = Math.Pow(2, -20);
 
-        public ComplexFunction[] Derivatives { get; set; }
+        public IComplexFunction[] Derivatives { get; set; }
         public int MaximumIterationCount { get; set; } = 30;
 
         public AlgorithmResult Compute(Complex z)
@@ -64,16 +64,16 @@ namespace Fractal_Designer
             Complex q, A, B, C;
 
             zzz = z;
-            fzzz = Derivatives[0](z);
+            fzzz = Derivatives[0].Compute(z);
 
             zz = z * (1 - eps11);
-            fzz = Derivatives[0](zz);
+            fzz = Derivatives[0].Compute(zz);
 
             zz = zzz - zzz * (zzz - zz) * fzz / (fzzz - fzz);
-            fzz = Derivatives[0](zz);
+            fzz = Derivatives[0].Compute(zz);
 
             z = zz - zz * (zzz - zz) * fzz / (fzzz - fzz);
-            fz = Derivatives[0](z);
+            fz = Derivatives[0].Compute(z);
 
             iterationsLeft -= 2;
 
@@ -103,7 +103,7 @@ namespace Fractal_Designer
                 zz = z;
                 fzz = fz;
                 z -= delta;
-                fz = Derivatives[0](z);
+                fz = Derivatives[0].Compute(z);
 
             } while (--iterationsLeft >= 0 && delta.Magnitude > Math.Max(eps44, z.Magnitude * eps20));
 
@@ -118,7 +118,7 @@ namespace Fractal_Designer
         double eps20 = Math.Pow(2, -20);
         double eps11 = Math.Pow(2, -11);
 
-        public ComplexFunction[] Derivatives { get; set; }
+        public IComplexFunction[] Derivatives { get; set; }
         public int MaximumIterationCount { get; set; }
 
         public AlgorithmResult Compute(Complex z)
@@ -128,8 +128,8 @@ namespace Fractal_Designer
 
             do
             {
-                fz = Derivatives[0](z);
-                delta = fz / Derivatives[1](z);
+                fz = Derivatives[0].Compute(z);
+                delta = fz / Derivatives[1].Compute(z);
                 if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))
                     return new AlgorithmResult() { z = z, iterations = MaximumIterationCount - iterationsLeft, succeeded = false };
 
@@ -147,7 +147,7 @@ namespace Fractal_Designer
         double eps11 = Math.Pow(2, -11);
         double eps20 = Math.Pow(2, -20);
 
-        public ComplexFunction[] Derivatives { get; set; }
+        public IComplexFunction[] Derivatives { get; set; }
         public int MaximumIterationCount { get; set; }
         public double Parameter { get; set; }
 
@@ -157,13 +157,13 @@ namespace Fractal_Designer
             Complex delta;
             Complex zz, zzz, fz, fzz, fzzz;
             zzz = z;
-            fzzz = Derivatives[0](z);
+            fzzz = Derivatives[0].Compute(z);
 
             zz = z * (1 - eps11);
-            fzz = Derivatives[0](zz);
+            fzz = Derivatives[0].Compute(zz);
 
             z = zzz - (zzz - zz) * fzz / (fzzz - fzz);
-            fz = Derivatives[0](z);
+            fz = Derivatives[0].Compute(z);
 
             // newton-alike
             //z = zz;
@@ -191,7 +191,7 @@ namespace Fractal_Designer
                 zz = z;
                 fzz = fz;
                 z -= delta;
-                fz = Derivatives[0](z);
+                fz = Derivatives[0].Compute(z);
 
             } while (--iterationsLeft >= 0 && delta.Magnitude > Math.Max(eps44, z.Magnitude * eps20));
 

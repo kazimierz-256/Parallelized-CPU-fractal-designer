@@ -34,9 +34,7 @@ namespace Fractal_Designer
         {
             InitializeComponent();
 
-            Settings.Recompute += ComputeFractal;
-
-            // lookup on the internet how should the two cooperate in a good way
+            Settings.Recompute += RecomputeFractal;
         }
 
         private void Fractal_MouseDown(object sender, MouseButtonEventArgs e)
@@ -68,7 +66,7 @@ namespace Fractal_Designer
             var result = results[re, im];
 
             if (result.succeeded)
-                Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z}, f(Result)={Function(result.z)}, Position={MouseLastMovedComplex}";
+                Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z}, f(Result)={Function.Compute(result.z)}, Position={MouseLastMovedComplex}";
             else
                 Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations} (fail), Position={MouseLastMovedComplex}";
         }
@@ -86,15 +84,16 @@ namespace Fractal_Designer
 
             Settings.Instance.radius = (decimal) radius;
 
-            // to allow proportional zooming to points of interest
-            Settings.Instance.center += (MouseLastMovedComplex - Settings.Instance.center) * (1 - multiplier);
+            // to allow proportional zooming to points of interest but only if zooming in
+            if (multiplier < 1)
+                Settings.Instance.center += (MouseLastMovedComplex - Settings.Instance.center) * (1 - multiplier);
 
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Fractal.Width = Width - 40;
-            Fractal.Height = Height - 80;
+            Fractal.Height = Height - 180;
             ComputeFractal();
         }
 
@@ -118,7 +117,29 @@ namespace Fractal_Designer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) => SettingsWindow?.Close();
 
-        private void Exit(object sender, RoutedEventArgs e) => Close();
+        private void Exit(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
 
+        private void Interpret(object sender, TextChangedEventArgs e)
+        {
+            if (!IsLoaded)
+                return;
+
+            var succeeded = Interpreter.TryParse(Formula.Text, out IComplexFunction result);
+
+            if (succeeded)
+            {
+                //Title = ""
+                //Title = $"Result for z=3 is: {result.Compute(3)}";
+                Function = result;
+                Formula.Foreground = Brushes.Black;
+                RecomputeFractal();
+            }
+            else
+            {
+                Formula.Foreground = Brushes.Red;
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e) => Interpret(null, null);
     }
 }

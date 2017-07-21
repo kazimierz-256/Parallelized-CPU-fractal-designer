@@ -96,10 +96,13 @@ namespace Fractal_Designer
                     {
                         workOffline = true;
                         programSettings = new Settings();
+                        programSettings.Reset();
                     }
                 }
 
-                Save(new Settings(), true);
+                programSettings = new Settings();
+                programSettings.Reset();
+                Save(programSettings, true);
 
                 try
                 {
@@ -112,6 +115,7 @@ namespace Fractal_Designer
 
                     workOffline = true;
                     programSettings = new Settings();
+                    programSettings.Reset();
                 }
             }
             finally
@@ -176,19 +180,15 @@ namespace Fractal_Designer
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
     public partial class Settings : INotifyPropertyChanged
     {
-        private decimal radiusField = 1;
-
-        private decimal centerrealField = 0;
-
-        private decimal centerimaginaryField = 0;
-
-        private decimal parameterField = 1;
-
-        private ushort iterationsField = 50;
-
-        private ushort drageffectField = 0;
-
-        private ushort algorithmField = 1;
+        private decimal radiusField;
+        private decimal centerrealField;
+        private decimal centerimaginaryField;
+        private decimal parameterField;
+        private ushort iterationsField;
+        private ushort drageffectField;
+        private ushort algorithmField;
+        // take care of the formula
+        private string formulaField;
 
         public decimal radius
         {
@@ -318,6 +318,7 @@ namespace Fractal_Designer
                 if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("drageffect"));
+                    Recompute?.Invoke();
                     Save(this);
                 }
             }
