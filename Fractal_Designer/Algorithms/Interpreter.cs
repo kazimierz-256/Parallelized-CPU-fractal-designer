@@ -31,12 +31,12 @@ namespace Fractal_Designer
             { "asin(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Asin(args[0].Compute(z)) } },
             { "atan(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Atan(args[0].Compute(z)) } },
             { "'(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Conjugate(args[0].Compute(z)) } },
+            { "-(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Negate(args[0].Compute(z)) } },
             { "cos(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Cos(args[0].Compute(z)) } },
             { "cosh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Cosh(args[0].Compute(z)) } },
             { "exp(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Exp(args[0].Compute(z)) } },
             { "log(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Log(args[0].Compute(z)) } },
             { "log10(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Log10(args[0].Compute(z)) } },
-            { "--", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Negate(args[0].Compute(z)) } },
             { "sin(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sin(args[0].Compute(z)) } },
             { "sinh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sinh(args[0].Compute(z)) } },
             { "sqrt(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sqrt(args[0].Compute(z)) } },
@@ -55,16 +55,22 @@ namespace Fractal_Designer
         class ParseTreeGenerator
         {
             Stack<IComplexFunction> ExpressionStack = new Stack<IComplexFunction>();
+            Stack<int> DeepnessStack = new Stack<int>();
 
-            public bool TryParseExpression(string expression, out IComplexFunction complexFunction, bool mutable = false)
+            public bool TryParseExpression(string expression, out IComplexFunction complexFunction, out int outdeepness, int deepness, bool mutable = false)
             {
                 complexFunction = null;
+                outdeepness = -1;
 
                 if (operators.ContainsKey(expression))
                 {
 
                     if (mutable)
                     {
+                        if (expression == "-" && ExpressionStack.Count == 1)
+                        {
+                            //= "Could fix the minus...";
+                        }
                         // an unsupported operator
                         if (operators[expression].function == null || ExpressionStack.Count < operators[expression].ArgumentCount)
                             return false;
@@ -76,9 +82,15 @@ namespace Fractal_Designer
                         for (int i = operators[expression].ArgumentCount - 1; i >= 0; i--)
                         {
                             arguments[i] = ExpressionStack.Pop();
+                            if (DeepnessStack.Peek() != deepness)
+                            {
+
+                            }
+                            DeepnessStack.Pop();
                         }
 
                         complexFunction = new ClassicComplexFunction(z => operators[expression].function(z, arguments));
+                        outdeepness = deepness - 1;
                     }
                 }
                 else
@@ -118,16 +130,19 @@ namespace Fractal_Designer
                 // let's be fair and do not provide anythin undefined if the user just asks for parsability
                 if (!mutable)
                     complexFunction = null;
-
+                outdeepness = deepness;
                 return true;
             }
 
-            public bool Enqueue(string expression)
+            public bool Enqueue(string expression, int deepness)
             {
-                bool succeeded = TryParseExpression(expression, out IComplexFunction complexFunction, true);
+                bool succeeded = TryParseExpression(expression, out IComplexFunction complexFunction, out int outdeepness, deepness, true);
 
                 if (succeeded)
+                {
                     ExpressionStack.Push(complexFunction);
+                    DeepnessStack.Push(outdeepness);
+                }
 
                 return succeeded;
             }
@@ -153,6 +168,7 @@ namespace Fractal_Designer
             var operatorStack = new Stack<string>();
             string expression = string.Empty;
             returnValue = null;
+            int deepness = 0;
 
             // remove all whitespace characters
             formula = Regex.Replace(formula, @"\s+", "");
@@ -161,10 +177,10 @@ namespace Fractal_Designer
             {
                 expression += formula[cursor].ToString().ToLower();
 
-                var succeeded = expressionQueue.TryParseExpression(expression, out _);
+                var succeeded = expressionQueue.TryParseExpression(expression, out _, out _, deepness);
 
                 if (!operators.ContainsKey(expression) && cursor < formula.Length - 1)
-                    succeeded = succeeded && !expressionQueue.TryParseExpression(expression + formula[cursor + 1], out _);
+                    succeeded = succeeded && !expressionQueue.TryParseExpression(expression + formula[cursor + 1], out _, out _, deepness);
 
                 // if able to parse, but no further (lazy evaluation)
                 if (!succeeded)
@@ -183,7 +199,7 @@ namespace Fractal_Designer
                         // crushing until "(" or "sin(" found
                         while (operatorStack.Count > 0 && !operators[operatorStack.Peek()].IsOpening)
                         {
-                            if (!expressionQueue.Enqueue(operatorStack.Pop()))
+                            if (!expressionQueue.Enqueue(operatorStack.Pop(), deepness))
                                 return false;
                         }
 
@@ -195,29 +211,33 @@ namespace Fractal_Designer
 
                         // an opening operator that is not "(" should carry useful information with it, let's keep it!
                         if (openingOperator != "(")
-                            if (!expressionQueue.Enqueue(openingOperator))
+                            if (!expressionQueue.Enqueue(openingOperator, deepness))
                                 return false;
+
+                        --deepness;
+
                     }
                     else if (operators[expression].IsOpening)
                     {
                         // highest priority when adding yet lowest when already inside (to stop propagating)
                         operatorStack.Push(expression);
+                        ++deepness;
                     }
                     else
                     {
                         while (operatorStack.Count > 0 && !operators[operatorStack.Peek()].IsOpening && operators[operatorStack.Peek()].Priority >= operators[expression].Priority)
                         {
-                            if (!expressionQueue.Enqueue(operatorStack.Pop()))
+                            if (!expressionQueue.Enqueue(operatorStack.Pop(), deepness))
                                 return false;
                         }
-
+                        
                         operatorStack.Push(expression);
                     }
                 }
                 else
                 {
                     // a constant value like "12345", or argument "z"
-                    if (!expressionQueue.Enqueue(expression))
+                    if (!expressionQueue.Enqueue(expression, deepness))
                         return false;
                 }
 
@@ -227,7 +247,7 @@ namespace Fractal_Designer
 
             while (operatorStack.Count > 0)
             {
-                if (!expressionQueue.Enqueue(operatorStack.Pop()))
+                if (!expressionQueue.Enqueue(operatorStack.Pop(), deepness))
                     return false;
             }
 
