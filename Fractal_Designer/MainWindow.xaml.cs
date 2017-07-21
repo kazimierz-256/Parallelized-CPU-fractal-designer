@@ -24,10 +24,10 @@ namespace Fractal_Designer
     public partial class MainWindow : Window
     {
         SettingsWindow SettingsWindow;
-        Complex MouseLastClickComplex;
-        Point MouseLastClicked;
+        Complex MouseLastClickedComplex;
         Point MouseLastMoved;
         Complex MouseLastMovedComplex;
+        Complex CenterLastClicked;
         // odwrotna notacja polska zaimplementować
 
         public MainWindow()
@@ -41,9 +41,9 @@ namespace Fractal_Designer
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                MouseLastClicked = Mouse.GetPosition(Fractal);
-                MouseLastClickComplex = GetComplexCoords(MouseLastClicked);
-                ComputeFractal(MouseLastClickComplex);
+                CenterLastClicked = Settings.Instance.center;
+                MouseLastClickedComplex = GetComplexCoords(Mouse.GetPosition(Fractal));
+                ComputeFractal(MouseLastClickedComplex);
             }
         }
 
@@ -54,16 +54,18 @@ namespace Fractal_Designer
             MouseLastMoved = Mouse.GetPosition(Fractal);
             MouseLastMovedComplex = GetComplexCoords(MouseLastMoved);
 
+            // recompute not so often...
             if (Mouse.LeftButton == MouseButtonState.Pressed)
-                ComputeFractal(GetComplexCoords(MouseLastMoved));
+                ComputeFractal(MouseLastMovedComplex);
 
-            int re = (int) MouseLastMoved.X;
-            int im = (int) MouseLastMoved.Y;
-            var results = ((BitmapSourceResult) (sender as Image).Tag).results;
-            if (results == null || re < 0 || im < 0 || re >= results.GetLength(0) || im >= results.GetLength(1))
+            var bitmapSourceResult = (BitmapSourceResult) (sender as Image).Tag;
+            int re = (int) (MouseLastMoved.X * (bitmapSourceResult.bitmap.PixelWidth) / Fractal.Width);
+            int im = (int) (MouseLastMoved.Y * (bitmapSourceResult.bitmap.PixelHeight) / Fractal.Height);
+
+            if (bitmapSourceResult.results == null || re < 0 || im < 0 || re >= bitmapSourceResult.results.GetLength(0) || im >= bitmapSourceResult.results.GetLength(1))
                 return;
 
-            var result = results[re, im];
+            var result = bitmapSourceResult.results[re, im];
 
             if (result.succeeded)
                 Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z}, f(Result)={Function.Compute(result.z)}, Position={MouseLastMovedComplex}";

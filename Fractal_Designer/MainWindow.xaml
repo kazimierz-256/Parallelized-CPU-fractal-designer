@@ -13,7 +13,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <TextBox Name="Formula" Text="sin( z - 10 )" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="36" FontFamily="Segoe UI Light"/>
+            <TextBox Name="Formula" Text="z ^ 3 - 1" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="36" FontFamily="Cambria Math"/>
         </Grid>
         <!-- what if it were a canvas? -->
         <!--wouldn't it be nice to compare side by side?-->

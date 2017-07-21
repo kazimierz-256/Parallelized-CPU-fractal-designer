@@ -38,10 +38,13 @@ namespace Fractal_Designer
 
         private void ComputeFractal(Complex complexCoordinates)
         {
+            // consider reverting AlgorithmFunction to the original sometime
             switch ((DragEffect) Settings.Instance.drageffect)
             {
                 case DragEffect.Move:
-                    Settings.Instance.center += MouseLastClickComplex - complexCoordinates;
+                    // great loss of precision here. Should remember original position and then recompute?
+                    // fix this!
+                    Settings.Instance.center = CenterLastClicked + (complexCoordinates - MouseLastClickedComplex);
                     break;
                 case DragEffect.SingleRoot:
                     AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) * (z - complexCoordinates));
@@ -54,8 +57,6 @@ namespace Fractal_Designer
                     break;
                 case DragEffect.Singularity:
                     AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) / (z - complexCoordinates));
-                    break;
-                default:
                     break;
             }
 
