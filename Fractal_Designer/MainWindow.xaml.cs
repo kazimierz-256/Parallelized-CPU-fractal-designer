@@ -28,7 +28,6 @@ namespace Fractal_Designer
         Point MouseLastMoved;
         Complex MouseLastMovedComplex;
         Complex CenterLastClicked;
-        // odwrotna notacja polska zaimplementować
 
         public MainWindow()
         {
@@ -58,9 +57,9 @@ namespace Fractal_Designer
             if (Mouse.LeftButton == MouseButtonState.Pressed)
                 ComputeFractal(MouseLastMovedComplex);
 
-            var bitmapSourceResult = (BitmapSourceResult) (sender as Image).Tag;
-            int re = (int) (MouseLastMoved.X * (bitmapSourceResult.bitmap.PixelWidth) / Fractal.Width);
-            int im = (int) (MouseLastMoved.Y * (bitmapSourceResult.bitmap.PixelHeight) / Fractal.Height);
+            var bitmapSourceResult = (BitmapSourceResult)(sender as Image).Tag;
+            int re = (int)(MouseLastMoved.X * (bitmapSourceResult.bitmap.PixelWidth) / Fractal.Width);
+            int im = (int)(MouseLastMoved.Y * (bitmapSourceResult.bitmap.PixelHeight) / Fractal.Height);
 
             if (bitmapSourceResult.results == null || re < 0 || im < 0 || re >= bitmapSourceResult.results.GetLength(0) || im >= bitmapSourceResult.results.GetLength(1))
                 return;
@@ -68,23 +67,23 @@ namespace Fractal_Designer
             var result = bitmapSourceResult.results[re, im];
 
             if (result.succeeded)
-                Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z}, f(Result)={Function.Compute(result.z)}, Position={MouseLastMovedComplex}";
+                Status.Text = $"Radius={(double)Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z}, f(Result)={Function.Compute(result.z)}, Position={MouseLastMovedComplex}";
             else
-                Status.Text = $"Radius={(double) Settings.Instance.radius}, Iterations={result.iterations} (fail), Position={MouseLastMovedComplex}";
+                Status.Text = $"Radius={(double)Settings.Instance.radius}, Iterations={result.iterations} (fail), Position={MouseLastMovedComplex}";
         }
 
         private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             double multiplier = Math.Max(Math.Pow(.5, e.Delta / 100), 1d / (1 << 10));
 
-            double radius = (double) Settings.Instance.radius;
+            double radius = (double)Settings.Instance.radius;
 
             if (radius == 0 || double.IsInfinity(radius) || double.IsNaN(radius))
                 radius = 1;
 
             radius *= multiplier;
 
-            Settings.Instance.radius = (decimal) radius;
+            Settings.Instance.radius = (decimal)radius;
 
             // to allow proportional zooming to points of interest but only if zooming in
             if (multiplier < 1)
@@ -117,11 +116,9 @@ namespace Fractal_Designer
 
         private void Fractal_MouseLeave(object sender, MouseEventArgs e) => Status.Text = "";
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) => SettingsWindow?.Close();
+        private void Exit(object sender, RoutedEventArgs e) => Application.Current?.Shutdown();
 
-        private void Exit(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
-
-        private void Interpret(object sender, TextChangedEventArgs e)
+        private void Interpret(object sender = null, TextChangedEventArgs e = null)
         {
             if (!IsLoaded)
                 return;
@@ -142,6 +139,6 @@ namespace Fractal_Designer
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e) => Interpret(null, null);
+        private void Window_Loaded(object sender, RoutedEventArgs e) => Interpret();
     }
 }

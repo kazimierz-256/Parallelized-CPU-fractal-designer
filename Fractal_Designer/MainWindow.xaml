@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fractal_Designer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1500" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel" Closing="Window_Closing" WindowStartupLocation="CenterScreen" UseLayoutRounding="True" Loaded="Window_Loaded">
+        Title="MainWindow" Height="900" Width="1500" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel"
+        WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True" Loaded="Window_Loaded">
     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,16 +18,19 @@
         </Grid>
         <!-- what if it were a canvas? -->
         <!--wouldn't it be nice to compare side by side?-->
-        <Image Grid.Row="1" Name="Fractal" Stretch="UniformToFill" MouseDown="Fractal_MouseDown" MouseMove="Fractal_MouseMove" MouseLeave="Fractal_MouseLeave" Cursor="Cross" RenderOptions.BitmapScalingMode="LowQuality">
-            <Image.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Settings" Click="OpenSettings"/>
-                    <MenuItem Header="Export"/>
-                    <Separator/>
-                    <MenuItem Header="Exit" Click="Exit"/>
-                </ContextMenu>
-            </Image.ContextMenu>
-        </Image>
+        <Grid Grid.Row="1">
+            <Image Name="Fractal" Stretch="UniformToFill" MouseDown="Fractal_MouseDown" MouseMove="Fractal_MouseMove"
+                   MouseLeave="Fractal_MouseLeave" Cursor="Cross" RenderOptions.BitmapScalingMode="LowQuality">
+                <Image.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Settings" Click="OpenSettings"/>
+                        <MenuItem Header="Export"/>
+                        <Separator/>
+                        <MenuItem Header="Exit" Click="Exit"/>
+                    </ContextMenu>
+                </Image.ContextMenu>
+            </Image>
+        </Grid>
 
         <StatusBar Grid.Row="2">
             <TextBlock Name="Status" Padding="5"/>
