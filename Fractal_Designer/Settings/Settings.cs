@@ -217,6 +217,8 @@ namespace Fractal_Designer
                     return;
 
                 centerrealField = value;
+                CenterSaved = new Complex((double)centerrealField, (double)centerimaginaryField);
+
                 if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerreal"));
@@ -235,6 +237,8 @@ namespace Fractal_Designer
                     return;
 
                 centerimaginaryField = value;
+                CenterSaved = new Complex((double)centerrealField, (double)centerimaginaryField);
+
                 if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerimaginary"));
@@ -245,9 +249,11 @@ namespace Fractal_Designer
         }
 
         [XmlIgnore]
+        private Complex CenterSaved;
+        [XmlIgnore]
         public Complex center
         {
-            get => new Complex((double) Instance.centerreal, (double) Instance.centerimaginary);
+            get => CenterSaved;
             set
             {
                 if ((decimal) value.Real == Instance.centerrealField && (decimal) value.Imaginary == Instance.centerimaginaryField)
@@ -255,7 +261,7 @@ namespace Fractal_Designer
 
                 Instance.centerrealField = (decimal) value.Real;
                 Instance.centerimaginary = (decimal) value.Imaginary;
-
+                CenterSaved = value;
 
                 if (!ForbidRefresh)
                 {

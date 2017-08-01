@@ -32,7 +32,7 @@ namespace Fractal_Designer
 
             Task.Factory.StartNew(() =>
             {
-                double parallelThreshold = 9;
+                const double parallelThreshold = 3;
 
                 foreach (var divisor in new double[] { 243, 81, 27, 9, 3, 1, .5 })
                     GetBitmapAndReport(divisor, divisor <= parallelThreshold);
@@ -44,7 +44,7 @@ namespace Fractal_Designer
                 if (token.IsCancellationRequested)
                     return;
 
-                var result = colourer.GetBitmapSourceFromComplexGrid(center, radius, (int) (width / divisor), (int) (height / divisor), token.Token, parallel);
+                var result = colourer.GetBitmapSourceFromComplexGrid(center, radius, (int)(width / divisor), (int)(height / divisor), token.Token, parallel);
 
                 if (token.IsCancellationRequested)
                     return;
@@ -60,9 +60,9 @@ namespace Fractal_Designer
 
             void Report(BitmapSourceResult result)
             {
-                Fractal.Dispatcher.BeginInvoke(new Action(() =>
+                Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (!token.IsCancellationRequested && (Fractal.Tag == null || result.taskID != ((BitmapSourceResult) Fractal.Tag).taskID || result.timesSmaller < ((BitmapSourceResult) Fractal.Tag).timesSmaller))
+                    if (!token.IsCancellationRequested && (Fractal.Tag == null || result.taskID != ((BitmapSourceResult)Fractal.Tag).taskID || result.timesSmaller < ((BitmapSourceResult)Fractal.Tag).timesSmaller))
                     {
                         lock (Fractal)
                         {
@@ -73,7 +73,7 @@ namespace Fractal_Designer
                         }
                     }
 
-                }), System.Windows.Threading.DispatcherPriority.Render);
+                }));
             }// end Report
         }// end AsyncDraw
 

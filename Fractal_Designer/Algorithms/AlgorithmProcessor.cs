@@ -15,7 +15,7 @@ namespace Fractal_Designer
     {
         public IFractalAlgorithm FractalAlgorithm { get; set; }
 
-        public AlgorithmProcessor(IFractalAlgorithm fractalAlgorithm) => this.FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
+        public AlgorithmProcessor(IFractalAlgorithm fractalAlgorithm) => FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
 
         public BitmapSourceResult GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken(), bool parallel = false)
         {
@@ -41,13 +41,39 @@ namespace Fractal_Designer
 
             if (parallel)
             {
-                Parallel.For(0, lengthReal, (re, loopstate) =>
+                // minus one because of the UI thread
+                int completedRows = 0;
+
+                ShowProgress(0);
+
+                System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (token.IsCancellationRequested)
-                        loopstate.Break();
-                    else
-                        ComputeRow(re);
-                });
+                    if (System.Windows.Application.Current.MainWindow.TaskbarItemInfo != null)
+                        System.Windows.Application.Current.MainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                }));
+
+                Parallel.For(0, lengthReal, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount - 1 }, (re, loopstate) =>
+                    {
+                        if (token.IsCancellationRequested)
+                            loopstate.Break();
+                        else
+                        {
+                            ComputeRow(re);
+                            Interlocked.Increment(ref completedRows);
+                            ShowProgress(completedRows);
+                        }
+                    });
+
+                ShowProgress(0);
+
+                System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (System.Windows.Application.Current.MainWindow.TaskbarItemInfo != null)
+                        System.Windows.Application.Current.MainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+                }));
+
+                if (token.IsCancellationRequested)
+                    return new BitmapSourceResult { bitmap = null, results = null };
             }
             else
             {
@@ -63,14 +89,14 @@ namespace Fractal_Designer
             var bitmap = BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
             bitmap.Freeze();
             return new BitmapSourceResult { bitmap = bitmap, results = results };
-
+            
             void ComputeRow(int re)
             {
                 for (int im = 0; im < lengthImaginary; ++im)
                 {
                     // compute the location like in a grid (could be image-based but who wants it?)
-                    double realPosition = center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
-                    double imaginaryPosition = center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                    double realPosition = center.Real + ((re + .5) * 2d - lengthReal) / lengthReal * radiusReal;
+                    double imaginaryPosition = center.Imaginary + ((im + .5) * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
 
                     // compute the end result
                     results[re, im] = FractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
@@ -93,18 +119,33 @@ namespace Fractal_Designer
 
                 }
             }
+
+            void ShowProgress(int completedRows)
+            {
+                System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    var bar = ((System.Windows.Controls.ProgressBar)System.Windows.Application.Current?.MainWindow?.FindName("Progress"));
+                    if (bar == null)
+                        return;
+
+                    bar.Value = bar.Maximum * completedRows / lengthReal;
+
+                    if (System.Windows.Application.Current.MainWindow.TaskbarItemInfo != null)
+                        System.Windows.Application.Current.MainWindow.TaskbarItemInfo.ProgressValue = 1d * completedRows / lengthReal;
+                }));
+            }
         }
 
         private static (byte R, byte G, byte B) ColorFromHSV(double hue, double saturation, double value)
         {
-            var hi = (byte) ((int) (hue / 60) % 6);
-            double f = hue / 60 - (int) (hue / 60);
+            var hi = (byte)((int)(hue / 60) % 6);
+            double f = hue / 60 - (int)(hue / 60);
 
             value *= 255;
-            var v = (byte) value;
-            var p = (byte) (value * (1 - saturation));
-            var q = (byte) (value * (1 - f * saturation));
-            var t = (byte) (value * (1 - (1 - f) * saturation));
+            var v = (byte)value;
+            var p = (byte)(value * (1 - saturation));
+            var q = (byte)(value * (1 - f * saturation));
+            var t = (byte)(value * (1 - (1 - f) * saturation));
 
             if (hi == 0)
                 return (v, t, p);

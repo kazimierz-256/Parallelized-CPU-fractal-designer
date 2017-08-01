@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fractal_Designer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1500" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel"
+        Title="MainWindow" MinWidth="200" MinHeight="200" Height="900" Width="1500" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel"
         WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True" Loaded="Window_Loaded">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ProgressState="Normal" ProgressValue="1"/>
+    </Window.TaskbarItemInfo>
     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,7 +17,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <TextBox Name="Formula" Text="z ^ 3 - 1" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="36" FontFamily="Cambria Math"/>
+            <TextBox Name="Formula" Text="z ^ 3 - 1" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="30" FontFamily="Cambria Math"/>
         </Grid>
         <!-- what if it were a canvas? -->
         <!--wouldn't it be nice to compare side by side?-->
@@ -32,8 +35,11 @@
             </Image>
         </Grid>
 
-        <StatusBar Grid.Row="2">
-            <TextBlock Name="Status" Padding="5"/>
-        </StatusBar>
+        <!--<StatusBar Grid.Row="2">-->
+            <StackPanel Grid.Row="2" Orientation="Vertical">
+                <TextBlock Name="Status" Padding="5"/>
+                <ProgressBar Name="Progress" Maximum="1" Height="10" LargeChange="0.1"/>
+            </StackPanel>
+        <!--</StatusBar>-->
     </Grid>
 </Window>

@@ -25,7 +25,8 @@ namespace Fractal_Designer
     {
         SettingsWindow SettingsWindow;
         Complex MouseLastClickedComplex;
-        Point MouseLastMoved;
+        Point MouseLastClicked;
+        Point MouseLastMove;
         Complex MouseLastMovedComplex;
         Complex CenterLastClicked;
 
@@ -41,8 +42,11 @@ namespace Fractal_Designer
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
                 CenterLastClicked = Settings.Instance.center;
-                MouseLastClickedComplex = GetComplexCoords(Mouse.GetPosition(Fractal));
-                ComputeFractal(MouseLastClickedComplex);
+                MouseLastMove = MouseLastClicked = Mouse.GetPosition(Fractal);
+                MouseLastMovedComplex = MouseLastClickedComplex = GetComplexCoords(MouseLastClicked);
+
+                if ((DragEffect)Settings.Instance.drageffect != DragEffect.Move)
+                    ComputeFractal(MouseLastClickedComplex);
             }
         }
 
@@ -50,16 +54,16 @@ namespace Fractal_Designer
         {
             Fractal.Cursor = Settings.Instance.drageffect == 0 ? Cursors.Hand : Cursors.Cross;
 
-            MouseLastMoved = Mouse.GetPosition(Fractal);
-            MouseLastMovedComplex = GetComplexCoords(MouseLastMoved);
+            MouseLastMove = Mouse.GetPosition(Fractal);
+            MouseLastMovedComplex = GetComplexCoords(MouseLastMove);
 
             // recompute not so often...
             if (Mouse.LeftButton == MouseButtonState.Pressed)
                 ComputeFractal(MouseLastMovedComplex);
 
             var bitmapSourceResult = (BitmapSourceResult)(sender as Image).Tag;
-            int re = (int)(MouseLastMoved.X * (bitmapSourceResult.bitmap.PixelWidth) / Fractal.Width);
-            int im = (int)(MouseLastMoved.Y * (bitmapSourceResult.bitmap.PixelHeight) / Fractal.Height);
+            int re = (int)(MouseLastMove.X * (bitmapSourceResult.bitmap.PixelWidth) / Fractal.Width);
+            int im = (int)(MouseLastMove.Y * (bitmapSourceResult.bitmap.PixelHeight) / Fractal.Height);
 
             if (bitmapSourceResult.results == null || re < 0 || im < 0 || re >= bitmapSourceResult.results.GetLength(0) || im >= bitmapSourceResult.results.GetLength(1))
                 return;
