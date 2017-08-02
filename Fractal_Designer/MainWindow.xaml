@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fractal_Designer"
         mc:Ignorable="d"
-        Title="MainWindow" MinWidth="200" MinHeight="200" Height="900" Width="1500" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel"
-        WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True" Loaded="Window_Loaded">
+        Title="Fractal Designer" MinWidth="200" MinHeight="200" Height="900" Width="1500" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel"
+        WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True" Loaded="Window_Loaded" Icon="Icon.ico">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo ProgressState="Normal" ProgressValue="1"/>
     </Window.TaskbarItemInfo>

@@ -16,8 +16,10 @@ namespace Fractal_Designer
     public enum Algorithm
     {
         Newton,
+        NewtonWithoutDerivative,
         Kazimierz,
-        Muller
+        Muller,
+        Inverse,
     }
 
     public enum DragEffect
@@ -26,7 +28,7 @@ namespace Fractal_Designer
         SingleRoot,
         DoubleRoot,
         CircularRoot,
-        Singularity
+        Singularity,
     }
 
     public partial class Settings

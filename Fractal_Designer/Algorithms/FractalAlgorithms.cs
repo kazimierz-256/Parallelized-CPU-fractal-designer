@@ -16,14 +16,20 @@ namespace Fractal_Designer
             switch (algorithmID)
             {
                 // actually we really need the derivative so really (... >= 2)
-                case Algorithm.Newton when Derivatives.Length >= 1:
+                case Algorithm.Newton when Derivatives.Length >= 2:
                     algorithm = new NewtonFractal();
+                    break;
+                case Algorithm.NewtonWithoutDerivative when Derivatives.Length >= 1:
+                    algorithm = new NewtonWithoutDerivativeFractal();
                     break;
                 case Algorithm.Kazimierz when Derivatives.Length >= 1:
                     algorithm = new KazimierzFractal();
                     break;
                 case Algorithm.Muller when Derivatives.Length >= 1:
                     algorithm = new MullerFractal();
+                    break;
+                case Algorithm.Inverse when Derivatives.Length >= 1:
+                    algorithm = new InverseQuadraticFractal();
                     break;
                 default:
                     algorithm = new NullAlgorithm();
@@ -67,7 +73,7 @@ namespace Fractal_Designer
             zzz = z;
             fzzz = Derivatives[0].Compute(z);
 
-            zz = z * (1 - eps11);
+            zz = z * (1 + eps11);
             fzz = Derivatives[0].Compute(zz);
 
             zz = zzz - zzz * (zzz - zz) * fzz / (fzzz - fzz);
@@ -115,33 +121,34 @@ namespace Fractal_Designer
 
     public class NewtonFractal : IFractalAlgorithm
     {
-        // REQUIRES knowing the DERIVATIVE
+        double eps44 = Math.Pow(2, -44);
+        double eps20 = Math.Pow(2, -20);
+        double eps11 = Math.Pow(2, -11);
 
-        //double eps44 = Math.Pow(2, -44);
-        //double eps20 = Math.Pow(2, -20);
-        //double eps11 = Math.Pow(2, -11);
+        public IComplexFunction[] Derivatives { get; set; }
+        public int MaximumIterationCount { get; set; }
 
-        //public IComplexFunction[] Derivatives { get; set; }
-        //public int MaximumIterationCount { get; set; }
+        public AlgorithmResult Compute(Complex z)
+        {
+            int iterationsLeft = MaximumIterationCount;
+            Complex delta, fz;
 
-        //public AlgorithmResult Compute(Complex z)
-        //{
-        //    int iterationsLeft = MaximumIterationCount;
-        //    Complex delta, fz;
+            do
+            {
+                fz = Derivatives[0].Compute(z);
+                delta = fz / Derivatives[1].Compute(z);
+                if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))
+                    return new AlgorithmResult() { z = z, iterations = MaximumIterationCount - iterationsLeft, succeeded = false };
 
-        //    do
-        //    {
-        //        fz = Derivatives[0].Compute(z);
-        //        delta = fz / Derivatives[1].Compute(z);
-        //        if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))
-        //            return new AlgorithmResult() { z = z, iterations = MaximumIterationCount - iterationsLeft, succeeded = false };
+                z -= delta;
+            } while (--iterationsLeft >= 0 && delta.Magnitude > Math.Max(eps44, z.Magnitude * eps20));
 
-        //        z -= delta;
-        //    } while (--iterationsLeft >= 0 && delta.Magnitude > Math.Max(eps44, z.Magnitude * eps20));
+            return new AlgorithmResult() { z = z, iterations = MaximumIterationCount - iterationsLeft, succeeded = fz.Magnitude < eps11 && iterationsLeft >= 0 };
+        }
+    }
 
-        //    return new AlgorithmResult() { z = z, iterations = MaximumIterationCount - iterationsLeft, succeeded = fz.Magnitude < eps11 && iterationsLeft >= 0 };
-        //}
-
+    public class NewtonWithoutDerivativeFractal : IFractalAlgorithm
+    {
         double eps44 = Math.Pow(2, -44);
         double eps11 = Math.Pow(2, -11);
         double eps20 = Math.Pow(2, -20);
@@ -157,7 +164,7 @@ namespace Fractal_Designer
             zzz = z;
             fzzz = Derivatives[0].Compute(z);
 
-            zz = z * (1 - eps11);
+            zz = z * (1 + eps11);
             fzz = Derivatives[0].Compute(zz);
 
             z = zzz - (zzz - zz) * fzz / (fzzz - fzz);
@@ -175,7 +182,6 @@ namespace Fractal_Designer
 
             do
             {
-                // newton-alike
                 delta = z * eps11 * fz / (fz - Derivatives[0].Compute(z * (1 - eps11)));
 
                 if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))
@@ -187,7 +193,7 @@ namespace Fractal_Designer
                 fzz = fz;
                 z -= delta;
                 fz = Derivatives[0].Compute(z);
-                
+
             } while (--iterationsLeft >= 0 && delta.Magnitude > Math.Max(eps44, z.Magnitude * eps20));
 
             return new AlgorithmResult() { z = z, iterations = MaximumIterationCount - iterationsLeft, succeeded = fz.Magnitude < eps11 && iterationsLeft >= 0 };
@@ -214,7 +220,7 @@ namespace Fractal_Designer
             zzz = z;
             fzzz = Derivatives[0].Compute(z);
 
-            zz = z * (1 - eps11);
+            zz = z * (1 + eps11);
             fzz = Derivatives[0].Compute(zz);
 
             z = zzz - (zzz - zz) * fzz / (fzzz - fzz);
@@ -263,4 +269,77 @@ namespace Fractal_Designer
         }
     }
 
+    public class InverseQuadraticFractal : IFractalAlgorithm
+    {
+        double eps44 = Math.Pow(2, -44);
+        double eps11 = Math.Pow(2, -11);
+        double eps20 = Math.Pow(2, -20);
+
+        public IComplexFunction[] Derivatives { get; set; }
+        public int MaximumIterationCount { get; set; } = 30;
+
+        public AlgorithmResult Compute(Complex z)
+        {
+
+            int iterationsLeft = MaximumIterationCount;
+            Complex delta;
+            Complex zz, zzz, fz, fzz, fzzz;
+            zzz = z;
+            fzzz = Derivatives[0].Compute(z);
+
+            zz = z * (1 + eps11);
+            fzz = Derivatives[0].Compute(zz);
+
+            z = zzz - (zzz - zz) * fzz / (fzzz - fzz);
+            fz = Derivatives[0].Compute(z);
+
+            iterationsLeft -= 2;
+
+            if (double.IsNaN(z.Real) || double.IsNaN(z.Imaginary))
+                return new AlgorithmResult()
+                {
+                    z = z,
+                    iterations = MaximumIterationCount - iterationsLeft,
+                    succeeded = false,
+                };
+
+            do
+            {
+                delta = z -
+                    (
+                    (fzz * fz) / ((fzzz - fzz) * (fzzz - fz)) * zzz + 
+                    (fzzz * fz) / ((fzz - fzzz) * (fzz - fz)) * zz + 
+                    (fzzz * fzz) / ((fz - fzzz) * (fz - fzz)) * z
+
+                    );
+
+                if (double.IsNaN(delta.Real) || double.IsNaN(delta.Imaginary))
+                    return new AlgorithmResult()
+                    {
+                        z = z,
+                        iterations = MaximumIterationCount - iterationsLeft,
+                        succeeded = false,
+                    };
+
+                zzz = zz;
+                fzzz = fzz;
+                zz = z;
+                fzz = fz;
+                z -= delta;
+                fz = Derivatives[0].Compute(z);
+
+                //Complex ideal = -9;// new Complex(Math.Round(z.Real), Math.Round(z.Imaginary));
+                //orderOfConvergence.Push((Complex.Log((ideal - z).Magnitude / (ideal - zz).Magnitude) / Complex.Log((ideal - zz).Magnitude / (ideal - zzz).Magnitude)).Magnitude);
+            } while (--iterationsLeft >= 0 && delta.Magnitude > Math.Max(eps44, z.Magnitude * eps20));
+
+            return new AlgorithmResult()
+            {
+                z = z,
+                iterations = MaximumIterationCount - iterationsLeft,
+                succeeded = fz.Magnitude < eps11 && iterationsLeft >= 0,
+                //orderOfConvergence = orderOfConvergence.Peek(),
+            };
+        }
+
+    }
 }

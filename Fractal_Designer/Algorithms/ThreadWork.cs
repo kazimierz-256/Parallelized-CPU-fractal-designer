@@ -32,7 +32,7 @@ namespace Fractal_Designer
 
             Task.Factory.StartNew(() =>
             {
-                const double parallelThreshold = 3;
+                const double parallelThreshold = 9;
 
                 foreach (var divisor in new double[] { 243, 81, 27, 9, 3, 1, .5 })
                     GetBitmapAndReport(divisor, divisor <= parallelThreshold);
