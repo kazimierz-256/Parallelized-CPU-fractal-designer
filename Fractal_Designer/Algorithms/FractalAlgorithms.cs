@@ -206,7 +206,7 @@ namespace Fractal_Designer
 
         public AlgorithmResult Compute(Complex z)
         {
-            var orderOfConvergence = new Stack<double>();
+            //var orderOfConvergence = new Stack<double>();
 
             int iterationsLeft = MaximumIterationCount;
             Complex delta;
@@ -249,8 +249,8 @@ namespace Fractal_Designer
                 z -= delta;
                 fz = Derivatives[0].Compute(z);
 
-                Complex ideal = -9;// new Complex(Math.Round(z.Real), Math.Round(z.Imaginary));
-                orderOfConvergence.Push((Complex.Log((ideal - z).Magnitude / (ideal - zz).Magnitude) / Complex.Log((ideal - zz).Magnitude / (ideal - zzz).Magnitude)).Magnitude);
+                //Complex ideal = -9;// new Complex(Math.Round(z.Real), Math.Round(z.Imaginary));
+                //orderOfConvergence.Push((Complex.Log((ideal - z).Magnitude / (ideal - zz).Magnitude) / Complex.Log((ideal - zz).Magnitude / (ideal - zzz).Magnitude)).Magnitude);
             } while (--iterationsLeft >= 0 && delta.Magnitude > Math.Max(eps44, z.Magnitude * eps20));
 
             return new AlgorithmResult()
@@ -258,7 +258,7 @@ namespace Fractal_Designer
                 z = z,
                 iterations = MaximumIterationCount - iterationsLeft,
                 succeeded = fz.Magnitude < eps11 && iterationsLeft >= 0,
-                orderOfConvergence = orderOfConvergence.Peek(),
+                //orderOfConvergence = orderOfConvergence.Peek(),
             };
         }
     }

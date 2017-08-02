@@ -83,9 +83,8 @@ namespace Fractal_Designer
             { "+", new OperatorInformation{Priority=40, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z)+args[1].Compute(z) } },
             { "-", new OperatorInformation{Priority=40, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z)-args[1].Compute(z) } },
             { ")", new OperatorInformation{} },
-            { "(", new OperatorInformation{IsOpening=true} }
+            { "(", new OperatorInformation{IsOpening=true} },
         };
-
 
         static Dictionary<string, ConstantInformation> constants = new Dictionary<string, ConstantInformation>()
         {
@@ -94,7 +93,8 @@ namespace Fractal_Designer
             { "i", new ConstantInformation{ complexFunction = new ConstantComplexFunction(Complex.ImaginaryOne)} },
             { "_", new ConstantInformation{ complexFunction = new ConstantComplexFunction(-1)} },
             { "x", new ConstantInformation{ complexFunction = new ArgumentComplexFunction() } },
-            { "z", new ConstantInformation{ complexFunction = new ArgumentComplexFunction() } }
+            { "z", new ConstantInformation{ complexFunction = new ArgumentComplexFunction() } },
+            { "n", new ConstantInformation{ complexFunction = new RandomComplexFunction() } },
         };
 
         class ParseTreeGenerator

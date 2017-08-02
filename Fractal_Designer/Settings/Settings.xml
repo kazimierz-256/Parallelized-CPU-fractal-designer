@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <radius>4</radius>
-  <centerreal>0.0245216539476392</centerreal>
-  <centerimaginary>-0.259525050955112</centerimaginary>
+  <radius>0.03125</radius>
+  <centerreal>-0.00966936031181874</centerreal>
+  <centerimaginary>-0.00524072710804903</centerimaginary>
   <parameter>1</parameter>
   <iterations>200</iterations>
   <drageffect>0</drageffect>

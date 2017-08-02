@@ -32,18 +32,9 @@ namespace Fractal_Designer
         public Complex Compute(Complex z) => z;
     }
 
-    //class CombinedComplexFunction : IComplexFunction
-    //{
-    //    IComplexFunction complexFunction;
-    //    Func<Complex, Complex, Complex> function;
-
-    //    public Complex Compute(Complex z) => function(z, complexFunction.Compute(z));
-
-    //    public CombinedComplexFunction(IComplexFunction complexFunction, Func<Complex, Complex, Complex> function)
-    //    {
-    //        this.complexFunction = complexFunction;
-    //        this.function = function;
-    //    }
-
-    //}
+    class RandomComplexFunction : IComplexFunction
+    {
+        static Random random = new Random();
+        public Complex Compute(Complex z) => random.NextDouble();
+    }
 }

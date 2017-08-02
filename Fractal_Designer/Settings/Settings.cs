@@ -52,8 +52,7 @@ namespace Fractal_Designer
             private set => _Instance = value;
         }
 
-        static Uri XmlPath = new Uri("../../Settings/Settings.xml", UriKind.Relative);
-        static Uri XsdPath = new Uri("../../Settings/Settings.xsd", UriKind.Relative);
+        static Uri XmlPath = new Uri("./Settings.xml", UriKind.Relative);
 
         public void Reset()
         {
@@ -153,7 +152,7 @@ namespace Fractal_Designer
         private static string ValidateSettings(Uri xmlFilename)
         {
             var xmlData = File.ReadAllText(xmlFilename.ToString());
-            var xsdData = File.ReadAllText(XsdPath.ToString());
+            var xsdData = Properties.Resources.Settings;
             var document = XDocument.Parse(xmlData);
             var schemaSet = new XmlSchemaSet();
 
