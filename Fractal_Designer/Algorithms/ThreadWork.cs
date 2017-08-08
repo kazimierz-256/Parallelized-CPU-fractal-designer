@@ -33,18 +33,19 @@ namespace Fractal_Designer
             Task.Factory.StartNew(() =>
             {
                 const double parallelThreshold = 9;
+                var colorer = new AlgorithmProcessor.Colourful();
 
                 foreach (var divisor in new double[] { 243, 81, 27, 9, 3, 1, .5 })
-                    GetBitmapAndReport(divisor, divisor <= parallelThreshold);
+                    GetBitmapAndReport(colorer, divisor, divisor <= parallelThreshold);
 
             }, token.Token).ContinueWith(new Action<Task>(t => t.Dispose()), token.Token);
 
-            void GetBitmapAndReport(double divisor, bool parallel)
+            void GetBitmapAndReport(IColorer colorer, double divisor, bool parallel)
             {
                 if (token.IsCancellationRequested)
                     return;
 
-                var result = colourer.GetBitmapSourceFromComplexGrid(center, radius, (int)(width / divisor), (int)(height / divisor), token.Token, parallel);
+                var result = colourer.GetBitmapSourceFromComplexGrid(colorer, center, radius, (int)(width / divisor), (int)(height / divisor), token.Token, parallel);
 
                 if (token.IsCancellationRequested)
                     return;

@@ -41,7 +41,7 @@ namespace Fractal_Designer
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                CenterLastClicked = Settings.Instance.center;
+                CenterLastClicked = Settings.Instance.Center;
                 MouseLastMove = MouseLastClicked = Mouse.GetPosition(Fractal);
                 MouseLastMovedComplex = MouseLastClickedComplex = GetComplexCoords(MouseLastClicked);
 
@@ -71,34 +71,34 @@ namespace Fractal_Designer
             var result = bitmapSourceResult.results[re, im];
 
             if (result.succeeded)
-                Status.Text = $"Radius={(double)Settings.Instance.radius}, Iterations={result.iterations}, Result={result.z}, f(Result)={Function.Compute(result.z)}, Position={MouseLastMovedComplex}";
+                Status.Text = $"Radius={Settings.Instance.Radius}{Environment.NewLine}Iterations={result.iterations}{Environment.NewLine}Result={result.z}{Environment.NewLine}f(Result)={Function.Compute(result.z)}{Environment.NewLine}Position={MouseLastMovedComplex}";
             else
-                Status.Text = $"Radius={(double)Settings.Instance.radius}, Iterations={result.iterations} (fail), Position={MouseLastMovedComplex}";
+                Status.Text = $"Radius={Settings.Instance.Radius}{Environment.NewLine}Iterations={result.iterations} (fail){Environment.NewLine}Position={MouseLastMovedComplex}";
         }
 
         private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             double multiplier = Math.Max(Math.Pow(.5, e.Delta / 100), 1d / (1 << 10));
 
-            double radius = (double)Settings.Instance.radius;
+            double radius = Settings.Instance.Radius;
 
             if (radius == 0 || double.IsInfinity(radius) || double.IsNaN(radius))
                 radius = 1;
 
             radius *= multiplier;
 
-            Settings.Instance.radius = (decimal)radius;
+            Settings.Instance.Radius = radius;
 
             // to allow proportional zooming to points of interest but only if zooming in
             if (multiplier < 1)
-                Settings.Instance.center += (MouseLastMovedComplex - Settings.Instance.center) * (1 - multiplier);
+                Settings.Instance.Center += (MouseLastMovedComplex - Settings.Instance.Center) * (1 - multiplier);
 
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Fractal.Width = Width - 40;
-            Fractal.Height = Height - 180;
+            Fractal.Width = Hope.ActualWidth;
+            Fractal.Height = Hope.ActualHeight;
             ComputeFractal();
         }
 
@@ -118,7 +118,7 @@ namespace Fractal_Designer
         }
 
 
-        private void Fractal_MouseLeave(object sender, MouseEventArgs e) => Status.Text = "";
+        private void Fractal_MouseLeave(object sender, MouseEventArgs e) => Status.Text = string.Empty;
 
         private void Exit(object sender, RoutedEventArgs e) => Application.Current?.Shutdown();
 
@@ -131,11 +131,9 @@ namespace Fractal_Designer
 
             if (succeeded)
             {
-                //Title = ""
-                //Title = $"Result for z=3 is: {result.Compute(3)}";
                 Function = result;
-                Formula.Foreground = Brushes.Black;
                 RecomputeFractal();
+                Formula.Foreground = Brushes.Black;
             }
             else
             {

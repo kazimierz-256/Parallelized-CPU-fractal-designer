@@ -23,19 +23,19 @@ namespace Fractal_Designer
             int lengthReal = (int)Fractal.Width;
             int lengthImaginary = (int)Fractal.Height;
 
-            double radiusReal = (double)Settings.Instance.radius;
-            double radiusImaginary = ((double)Settings.Instance.radius) * lengthImaginary / lengthReal;
+            double radiusReal = Settings.Instance.Radius;
+            double radiusImaginary = Settings.Instance.Radius * lengthImaginary / lengthReal;
 
             if (lengthReal < lengthImaginary)
             {
-                radiusReal = ((double)Settings.Instance.radius) * lengthReal / lengthImaginary;
-                radiusImaginary = (double)Settings.Instance.radius;
+                radiusReal = Settings.Instance.Radius * lengthReal / lengthImaginary;
+                radiusImaginary = Settings.Instance.Radius;
             }
 
             if (center == null)
             {
-                double realPosition = Settings.Instance.center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
-                double imaginaryPosition = Settings.Instance.center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                double realPosition = Settings.Instance.Center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
+                double imaginaryPosition = Settings.Instance.Center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
                 return new Complex(realPosition, imaginaryPosition);
             }
             else
@@ -48,24 +48,28 @@ namespace Fractal_Designer
         private static Random r = new Random();
         private void ComputeFractal(Complex complexCoordinates)
         {
-            // consider reverting AlgorithmFunction to the original sometime
             switch ((DragEffect)Settings.Instance.drageffect)
             {
                 case DragEffect.Move:
-                    Settings.Instance.center = CenterLastClicked - (GetComplexCoords(MouseLastMove, CenterLastClicked) - MouseLastClickedComplex);
+                    Settings.Instance.Center = CenterLastClicked - (GetComplexCoords(MouseLastMove, CenterLastClicked) - MouseLastClickedComplex);
                     break;
-                //case DragEffect.SingleRoot:
-                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) * (z - complexCoordinates));
-                //    break;
-                //case DragEffect.DoubleRoot:
-                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) * (z - complexCoordinates) * (z - complexCoordinates));
-                //    break;
-                //case DragEffect.CircularRoot:
-                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) * (z.Magnitude - complexCoordinates.Magnitude));
-                //    break;
-                //case DragEffect.Singularity:
-                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) / (z - complexCoordinates));
-                //    break;
+                case DragEffect.SingleRoot:
+                    AlgorithmFunction = new ComplexFunction.ProductCF(Function,
+                        new ComplexFunction.DifferenceCF(new ComplexFunction.ArgumentCF(), new ComplexFunction.ConstantCF(complexCoordinates)));
+                    break;
+                case DragEffect.DoubleRoot:
+                    AlgorithmFunction = new ComplexFunction.ProductCF(Function,
+                        new ComplexFunction.DifferenceCF(new ComplexFunction.ArgumentCF(), new ComplexFunction.ConstantCF(complexCoordinates)),
+                        new ComplexFunction.DifferenceCF(new ComplexFunction.ArgumentCF(), new ComplexFunction.ConstantCF(complexCoordinates))
+                        );
+                    break;
+                case DragEffect.Singularity:
+                    AlgorithmFunction = new ComplexFunction.QuotientCF(Function,
+                        new ComplexFunction.DifferenceCF(new ComplexFunction.ArgumentCF(), new ComplexFunction.ConstantCF(complexCoordinates)));
+                    break;
+                case DragEffect.Reset:
+                    AlgorithmFunction = Function;
+                    break;
                 default:
                     break;
             }
@@ -73,17 +77,17 @@ namespace Fractal_Designer
             ComputeFractal();
         }
 
-        private void ComputeFractal()/* => ComputeFractal(GetComplexCoords(Mouse.GetPosition(Fractal)));*/
+        private void ComputeFractal()
         {
-            if (Settings.Instance.center == null || double.IsNaN(Fractal.Width) || double.IsNaN(Fractal.Height) || Fractal.Width == 0 || Fractal.Height == 0)
+            if (Settings.Instance.Center == null || double.IsNaN(Fractal.Width) || double.IsNaN(Fractal.Height) || Fractal.Width == 0 || Fractal.Height == 0)
                 return;
 
             var fractalFactory = new ComplexFractalFactory();
             Colourer = new AlgorithmProcessor(fractalFactory.GetAutoConfiguredAlgorithmByID((Algorithm)Settings.Instance.algorithm, AlgorithmFunction ?? Function));
 
-            AsyncDraw(Colourer, Settings.Instance.center, (double)Settings.Instance.radius, (int)Fractal.Width, (int)Fractal.Height);
+            AsyncDraw(Colourer, Settings.Instance.Center, Settings.Instance.Radius, (int)Fractal.Width, (int)Fractal.Height);
 
-            Status.Text = $"Radius={(double)Settings.Instance.radius}";
+            Status.Text = $"Radius={Settings.Instance.Radius}";
         }
 
         private void RecomputeFractal() => ComputeFractal();

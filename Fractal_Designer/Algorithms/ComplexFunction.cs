@@ -54,53 +54,55 @@ namespace Fractal_Designer
                     case "&":
                         cf = new ProductCF();
                         break;
-                    //case "^":
-                    //    return null;
-                    //case "tan(":
-                    //    return null;
-                    //case "tanh(":
-                    //    return null;
-                    //case "sqrt(":
-                    //    return null;
-                    //case "sinh(":
-                    //    return null;
-                    //case "sin(":
-                    //    return null;
-                    //case "log(":
-                    //    return null;
-                    //case "log10(":
-                    //    return null;
-                    //case "[exp](":
-                    //    return null;
-                    //case "cos(":
-                    //    return null;
-                    //case "cosh(":
-                    //    return null;
-                    //case "polar(":
-                    //    return null;
-                    //case "[imag](":
-                    //    return null;
-                    //case "real(":
-                    //    return null;
-                    //case "phase(":
-                    //    return null;
-                    //case "conjugate(":
-                    //    return null;
-                    //case "atan(":
-                    //    return null;
-                    //case "asin(":
-                    //    return null;
-                    //case "acos(":
-                    //    return null;
-                    //case "abs(":
-                    //    return null;
+                    case "^":
+                        cf = new PowerCF();
+                        break;
+                    case "tan(":
+                        cf = new TanCF();
+                        break;
+                    case "tanh(":
+                        cf = new TanhCF();
+                        break;
+                    case "sqrt(":
+                        cf = new SqrtCF();
+                        break;
+                    case "sinh(":
+                        cf = new SinhCF();
+                        break;
+                    case "sin(":
+                        cf = new SinCF();
+                        break;
+                    case "log(":
+                        cf = new LogCF();
+                        break;
+                    case "log10(":
+                        cf = new Log10CF();
+                        break;
+                    case "[exp](":
+                        cf = new ExpCF();
+                        break;
+                    case "cos(":
+                        cf = new CosCF();
+                        break;
+                    case "cosh(":
+                        cf = new CoshCF();
+                        break;
+                    case "atan(":
+                        cf = new AtanCF();
+                        break;
+                    case "asin(":
+                        cf = new AsinCF();
+                        break;
+                    case "acos(":
+                        cf = new AcosCF();
+                        break;
 
                     default:
                         return null;
                 }
 
-                if (parameter != null)
-                    cf.InsertArguments((ComplexFunction[]) parameter);
+                if (parameter is ComplexFunction[])
+                    cf.InsertArguments((ComplexFunction[])parameter);
 
                 return cf;
             }
@@ -122,8 +124,7 @@ namespace Fractal_Designer
 
         class DifferenceCF : ComplexFunction
         {
-            public override Complex Compute(Complex z) =>
-                Arguments[0].Compute(z) - Arguments[1].Compute(z);
+            public override Complex Compute(Complex z) => Arguments[0].Compute(z) - Arguments[1].Compute(z);
 
             public override ComplexFunction GetDerivative() =>
                 new DifferenceCF(Arguments[0].GetDerivative(),
@@ -134,8 +135,7 @@ namespace Fractal_Designer
 
         class SumCF : ComplexFunction
         {
-            public override Complex Compute(Complex z) =>
-                Arguments[0].Compute(z) + Arguments[1].Compute(z);
+            public override Complex Compute(Complex z) => Arguments[0].Compute(z) + Arguments[1].Compute(z);
 
             public override ComplexFunction GetDerivative() =>
                 new SumCF(Arguments[0].GetDerivative(),
@@ -174,15 +174,128 @@ namespace Fractal_Designer
         class SinCF : ComplexFunction
         {
             public override Complex Compute(Complex z) => Complex.Sin(Arguments[0].Compute(z));
-            public override ComplexFunction GetDerivative() => new CosCF();
+            public override ComplexFunction GetDerivative() => new ProductCF(new CosCF(Arguments[0]), Arguments[0].GetDerivative());
             public SinCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
         }
 
         class CosCF : ComplexFunction
         {
             public override Complex Compute(Complex z) => Complex.Cos(Arguments[0].Compute(z));
-            public override ComplexFunction GetDerivative() => new NegateCF(new SinCF());
+            public override ComplexFunction GetDerivative() =>
+                new ProductCF(new NegateCF(new SinCF(Arguments[0])), Arguments[0].GetDerivative());
             public CosCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class PowerCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Pow(Arguments[0].Compute(z), Arguments[1].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new ProductCF(new PowerCF(Arguments[0], Arguments[1]),
+                    new SumCF(new QuotientCF(new ProductCF(Arguments[1], Arguments[0].GetDerivative()), Arguments[0]),
+                        new ProductCF(new LogCF(Arguments[0]), Arguments[1].GetDerivative())));
+            public PowerCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class LogCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Log(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() => new QuotientCF(Arguments[0].GetDerivative(), Arguments[0]);
+            public LogCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class Log10CF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Log10(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new QuotientCF(Arguments[0].GetDerivative(), new ProductCF(Arguments[0], new ConstantCF(Math.Log(10))));
+            public Log10CF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class TanCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Tan(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new QuotientCF(Arguments[0].GetDerivative(), new ProductCF(new CosCF(Arguments[0]), new CosCF(Arguments[0])));
+            public TanCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class SinhCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Sinh(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new ProductCF(Arguments[0].GetDerivative(), new CoshCF(Arguments[0]));
+            public SinhCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class CoshCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Cosh(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new ProductCF(Arguments[0].GetDerivative(), new SinhCF(Arguments[0]));
+            public CoshCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class TanhCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Tanh(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new QuotientCF(Arguments[0].GetDerivative(), new ProductCF(new CoshCF(Arguments[0]), new CoshCF(Arguments[0])));
+            public TanhCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class SqrtCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Sqrt(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new QuotientCF(Arguments[0].GetDerivative(), new ProductCF(new SqrtCF(Arguments[0]), new ConstantCF(2)));
+            public SqrtCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class ExpCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Exp(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new ProductCF(Arguments[0].GetDerivative(), new ExpCF(Arguments[0]));
+            public ExpCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class AtanCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Atan(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new QuotientCF(Arguments[0].GetDerivative(), new SumCF(
+                    new ConstantCF(1),
+                    new ProductCF(Arguments[0], Arguments[0])
+                    ));
+            public AtanCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class AsinCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Asin(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new QuotientCF(Arguments[0].GetDerivative(),
+                    new SqrtCF(
+                        new DifferenceCF(
+                            new ConstantCF(1),
+                            new ProductCF(Arguments[0], Arguments[0])
+                        )
+                    ));
+            public AsinCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
+        }
+
+        class AcosCF : ComplexFunction
+        {
+            public override Complex Compute(Complex z) => Complex.Acos(Arguments[0].Compute(z));
+            public override ComplexFunction GetDerivative() =>
+                new QuotientCF(new NegateCF(Arguments[0].GetDerivative()),
+                    new SqrtCF(
+                        new DifferenceCF(
+                            new ConstantCF(1),
+                            new ProductCF(Arguments[0], Arguments[0])
+                        )
+                    ));
+            public AcosCF(params ComplexFunction[] Arguments) => InsertArguments(Arguments);
         }
     }
 }

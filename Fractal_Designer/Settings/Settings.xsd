@@ -8,7 +8,7 @@
     <xsd:complexType>
       <xsd:sequence>
         
-        <xsd:element name="radius"
+        <xsd:element name="radiusD"
                      type="xsd:decimal" />
         <xsd:element name="centerreal"
                      type="xsd:decimal" />

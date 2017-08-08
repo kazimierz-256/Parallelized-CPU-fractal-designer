@@ -15,20 +15,22 @@ namespace Fractal_Designer
 {
     public enum Algorithm
     {
+        KazimierzHalleyFractal,
+        Halley,
         Newton,
         NewtonWithoutDerivative,
+        Inverse,
         Kazimierz,
         Muller,
-        Inverse,
     }
 
     public enum DragEffect
     {
         Move,
         SingleRoot,
-        DoubleRoot,
-        CircularRoot,
         Singularity,
+        DoubleRoot,
+        Reset,
     }
 
     public partial class Settings
@@ -56,19 +58,16 @@ namespace Fractal_Designer
 
         static Uri XmlPath = new Uri("./Settings.xml", UriKind.Relative);
 
-        public void Reset()
-        {
-            radius = 1;
-            center = 0;
-            parameter = 1;
-            iterations = 50;
-            drageffect = 0;
-            algorithm = 1;
-        }
-        
         private static bool ForbidRefresh = false;
         private static bool ForbidSaving = false;
         private static bool IsSaving = false;
+
+        public static void Reset()
+        {
+            Instance = new Settings();
+            Save();
+            Recompute();
+        }
 
         private static void Load() => Load(out _Instance);
         private static void Load(out Settings programSettings)
@@ -97,12 +96,10 @@ namespace Fractal_Designer
                     {
                         workOffline = true;
                         programSettings = new Settings();
-                        programSettings.Reset();
                     }
                 }
 
                 programSettings = new Settings();
-                programSettings.Reset();
                 Save(programSettings, true);
 
                 try
@@ -116,7 +113,6 @@ namespace Fractal_Designer
 
                     workOffline = true;
                     programSettings = new Settings();
-                    programSettings.Reset();
                 }
             }
             finally
@@ -181,17 +177,15 @@ namespace Fractal_Designer
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
     public partial class Settings : INotifyPropertyChanged
     {
-        private decimal radiusField;
-        private decimal centerrealField;
-        private decimal centerimaginaryField;
-        private decimal parameterField;
-        private ushort iterationsField;
-        private ushort drageffectField;
-        private ushort algorithmField;
-        // take care of the formula
-        private string formulaField;
+        private decimal radiusField = 1;
+        private decimal centerrealField = 0;
+        private decimal centerimaginaryField = 0;
+        private decimal parameterField = 1;
+        private ushort iterationsField = 100;
+        private ushort drageffectField = 0;
+        private ushort algorithmField = 0;
 
-        public decimal radius
+        public decimal radiusD
         {
             get => radiusField;
             set
@@ -199,10 +193,37 @@ namespace Fractal_Designer
                 if (value == radiusField)
                     return;
 
+                _Radius = (double)value;
                 radiusField = value;
                 if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("radius"));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
+            }
+        }
+
+        private double _Radius = 1;
+        [XmlIgnore]
+        public double Radius
+        {
+            get => _Radius;
+            set
+            {
+                if (value == _Radius)
+                    return;
+
+                _Radius = value;
+                if ((double)decimal.MaxValue < value)
+                {
+                    radiusD = decimal.MaxValue;
+                }
+                else
+                    radiusD = (decimal)value;
+                if (!ForbidRefresh)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Radius"));
                     Recompute?.Invoke();
                     Save(this);
                 }
@@ -249,19 +270,27 @@ namespace Fractal_Designer
             }
         }
 
+        private Complex CenterSaved = 0;
         [XmlIgnore]
-        private Complex CenterSaved;
-        [XmlIgnore]
-        public Complex center
+        public Complex Center
         {
             get => CenterSaved;
             set
             {
-                if ((decimal) value.Real == Instance.centerrealField && (decimal) value.Imaginary == Instance.centerimaginaryField)
+                var decimalizedReal = decimal.MaxValue;
+                var decimalizedImaginary = decimal.MaxValue;
+
+                if (value.Real < (double)decimalizedReal)
+                    decimalizedReal = (decimal)value.Real;
+
+                if (value.Imaginary < (double)decimalizedImaginary)
+                    decimalizedImaginary = (decimal)value.Real;
+
+                if (decimalizedReal == Instance.centerrealField && decimalizedImaginary == Instance.centerimaginaryField)
                     return;
 
-                Instance.centerrealField = (decimal) value.Real;
-                Instance.centerimaginary = (decimal) value.Imaginary;
+                Instance.centerrealField = decimalizedReal;
+                Instance.centerimaginary = decimalizedImaginary;
                 CenterSaved = value;
 
                 if (!ForbidRefresh)

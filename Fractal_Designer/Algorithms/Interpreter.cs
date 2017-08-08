@@ -16,7 +16,6 @@ namespace Fractal_Designer
             public bool IsOpening;
             public byte Priority;
             public int ArgumentCount;
-            //public Func<Complex, ComplexFunction[], Complex> function;
         }
         //struct BracketInformation
         //{
@@ -28,42 +27,19 @@ namespace Fractal_Designer
             //public ComplexFunction complexFunction;
         }
 
-        //static Dictionary<string, BracketInformation> openbrackets = new Dictionary<string, BracketInformation>()
-        //{
-        //    { "abs(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Abs(args[0].Compute(z)) } },
-        //    { "acos(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Acos(args[0].Compute(z)) } },
-        //    { "asin(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Asin(args[0].Compute(z)) } },
-        //    { "atan(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Atan(args[0].Compute(z)) } },
-        //    { "conjugate(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Conjugate(args[0].Compute(z)) } },
-        //    { "phase(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z).Phase } },
-        //    { "real(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z).Real } },
-        //    { "imag(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z).Imaginary } },
-        //    { "polar(", new OperatorInformation{ArgumentCount=2, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.FromPolarCoordinates(args[0].Compute(z).Magnitude, args[1].Compute(z).Magnitude) } },
-        //    { "cos(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Cos(args[0].Compute(z)) } },
-        //    { "cosh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Cosh(args[0].Compute(z)) } },
-        //    { "exp(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Exp(args[0].Compute(z)) } },
-        //    { "log(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Log(args[0].Compute(z)) } },
-        //    { "log10(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Log10(args[0].Compute(z)) } },
-        //    { "sin(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sin(args[0].Compute(z)) } },
-        //    { "sinh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sinh(args[0].Compute(z)) } },
-        //    { "sqrt(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sqrt(args[0].Compute(z)) } },
-        //    { "tan(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Tan(args[0].Compute(z)) } },
-        //    { "tanh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Tanh(args[0].Compute(z)) } }
-        //};
-
         static Dictionary<string, OperatorInformation> operators = new Dictionary<string, OperatorInformation>()
         {
-            { "abs)(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            //{ "abs)(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             { "acos)(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             { "asin(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             { "atan(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
-            { "conjugate(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
-            { "phase(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
-            { "real(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            //{ "conjugate(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            //{ "phase(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            //{ "real(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             // unfortunately there is so many bugs and unfinished parsing that the first letter should be unique to separately operators and constants
-            { "[imag](", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            //{ "[imag](", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             //, function=(Complex z, ComplexFunction[] args) => Complex.FromPolarCoordinates((double)args[0].Compute(z).Magnitude, (double)args[1].Compute(z).Magnitude) 
-            { "polar(", new OperatorInformation{ArgumentCount=2, IsOpening=true} },
+            //{ "polar(", new OperatorInformation{ArgumentCount=2, IsOpening=true} },
             { "cos(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             { "cosh(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             { "[exp](", new OperatorInformation{ArgumentCount=1, IsOpening=true} },

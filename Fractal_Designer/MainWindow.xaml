@@ -17,11 +17,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <TextBox Name="Formula" Text="z * z * z - 1" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="30" FontFamily="Cambria Math"/>
+            <TextBox Name="Formula" Text="z ^ 4 - i" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="30" FontFamily="Cambria Math"/>
         </Grid>
         <!-- what if it were a canvas? -->
         <!--wouldn't it be nice to compare side by side?-->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Name="Hope">
             <Image Name="Fractal" Stretch="UniformToFill" MouseDown="Fractal_MouseDown" MouseMove="Fractal_MouseMove"
                    MouseLeave="Fractal_MouseLeave" Cursor="Cross" RenderOptions.BitmapScalingMode="LowQuality">
                 <Image.ContextMenu>
@@ -35,11 +35,9 @@
             </Image>
         </Grid>
 
-        <!--<StatusBar Grid.Row="2">-->
-            <StackPanel Grid.Row="2" Orientation="Vertical">
-                <TextBlock Name="Status" Padding="5"/>
-                <ProgressBar Name="Progress" Maximum="1" Height="10" LargeChange="0.1"/>
-            </StackPanel>
-        <!--</StatusBar>-->
+        <StackPanel Grid.Row="2" Orientation="Vertical">
+            <TextBlock Name="Status" Padding="5"/>
+            <ProgressBar Name="Progress" Maximum="1" Height="10" LargeChange="0.1"/>
+        </StackPanel>
     </Grid>
 </Window>

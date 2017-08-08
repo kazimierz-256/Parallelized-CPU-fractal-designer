@@ -11,13 +11,14 @@ using System.Windows.Media.Imaging;
 
 namespace Fractal_Designer
 {
-    public class AlgorithmProcessor : IAlgorithmProcessor
+    public class AlgorithmProcessor
     {
         public IFractalAlgorithm FractalAlgorithm { get; set; }
 
-        public AlgorithmProcessor(IFractalAlgorithm fractalAlgorithm) => FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
+        public AlgorithmProcessor(IFractalAlgorithm fractalAlgorithm) =>
+            FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
 
-        public BitmapSourceResult GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken(), bool parallel = false)
+        public BitmapSourceResult GetBitmapSourceFromComplexGrid(IColorer colorer, Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken(), bool parallel = false)
         {
             if (lengthReal == 0 || lengthImaginary == 0)
                 return new BitmapSourceResult { bitmap = null, results = null };
@@ -68,7 +69,7 @@ namespace Fractal_Designer
 
                 System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (System.Windows.Application.Current.MainWindow.TaskbarItemInfo != null)
+                    if (System.Windows.Application.Current?.MainWindow?.TaskbarItemInfo != null)
                         System.Windows.Application.Current.MainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
                 }));
 
@@ -89,7 +90,7 @@ namespace Fractal_Designer
             var bitmap = BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
             bitmap.Freeze();
             return new BitmapSourceResult { bitmap = bitmap, results = results };
-            
+
             void ComputeRow(int re)
             {
                 for (int im = 0; im < lengthImaginary; ++im)
@@ -103,13 +104,7 @@ namespace Fractal_Designer
 
                     if (results[re, im].succeeded)
                     {
-                        double abs = results[re, im].z.Magnitude;
-                        double hue = 180d * (results[re, im].z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
-                        int iterationsSquared = results[re, im].iterations * results[re, im].iterations;
-                        double saturation = 700d / (800d + iterationsSquared) * (1 - eps10 / (eps10 + abs * abs));
-                        double value = 180d / (200d + iterationsSquared);
-
-                        (byte R, byte G, byte B) color = ColorFromHSV(hue, saturation, value);
+                        (byte R, byte G, byte B) color = colorer.Colour(results[re, im]);
 
                         fractal[4 * (lengthReal * im + re)] = color.B;
                         fractal[4 * (lengthReal * im + re) + 1] = color.G;
@@ -135,6 +130,37 @@ namespace Fractal_Designer
                 }));
             }
         }
+
+        public class Colourful : IColorer
+        {
+            static double eps10 = Math.Pow(2, -10);
+            public (byte R, byte G, byte B) Colour(AlgorithmResult result)
+            {
+                double abs = result.z.Magnitude;
+                double hue = 180d * (result.z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
+                int iterationsSquared = result.iterations * result.iterations;
+                double saturation = 700d / (800d + Math.Log(result.iterations)) * (1 - eps10 / (eps10 + abs * abs));
+                double value = 180d / (200d + iterationsSquared);
+
+                return ColorFromHSV(hue, saturation, value);
+            }
+        }
+
+        // TODO
+        //public class Bluish : IColorer
+        //{
+        //    static double eps10 = Math.Pow(2, -10);
+        //    public (byte R, byte G, byte B) Colour(AlgorithmResult result)
+        //    {
+        //        double abs = result.z.Magnitude;
+        //        double hue = 180d * (result.z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
+        //        int iterationsSquared = result.iterations * result.iterations;
+        //        double saturation = 700d / (800d + Math.Log(result.iterations)) * (1 - eps10 / (eps10 + abs * abs));
+        //        double value = 180d / (200d + iterationsSquared);
+
+        //        return ColorFromHSV(hue, saturation, value);
+        //    }
+        //}
 
         private static (byte R, byte G, byte B) ColorFromHSV(double hue, double saturation, double value)
         {

@@ -26,12 +26,11 @@ namespace Fractal_Designer
         IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params ComplexFunction.ComplexFunction[] Derivatives);
     }
 
-    public interface IAlgorithmProcessor
+    public interface IColorer
     {
-        IFractalAlgorithm FractalAlgorithm { get; set; }
-        BitmapSourceResult GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token, bool parallel);
+        (byte R, byte G, byte B) Colour(AlgorithmResult result);
     }
-    
+
     public struct BitmapSourceResult
     {
         public BitmapSource bitmap;

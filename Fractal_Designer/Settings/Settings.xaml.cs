@@ -37,6 +37,6 @@ namespace Fractal_Designer
             }
         }
 
-        private void Reset(object sender, RoutedEventArgs e) => Settings.Instance.Reset();
+        private void Reset(object sender, RoutedEventArgs e) => Settings.Reset();
     }
 }
