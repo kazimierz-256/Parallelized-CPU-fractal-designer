@@ -16,7 +16,7 @@ namespace Fractal_Designer
             public bool IsOpening;
             public byte Priority;
             public int ArgumentCount;
-            public Func<Complex, IComplexFunction[], Complex> function;
+            //public Func<Complex, ComplexFunction[], Complex> function;
         }
         //struct BracketInformation
         //{
@@ -25,7 +25,7 @@ namespace Fractal_Designer
         //}
         struct ConstantInformation
         {
-            public IComplexFunction complexFunction;
+            //public ComplexFunction complexFunction;
         }
 
         //static Dictionary<string, BracketInformation> openbrackets = new Dictionary<string, BracketInformation>()
@@ -53,57 +53,58 @@ namespace Fractal_Designer
 
         static Dictionary<string, OperatorInformation> operators = new Dictionary<string, OperatorInformation>()
         {
-            { "abs)(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Abs(args[0].Compute(z)) } },
-            { "acos)(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Acos(args[0].Compute(z)) } },
-            { "asin(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Asin(args[0].Compute(z)) } },
-            { "atan(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Atan(args[0].Compute(z)) } },
-            { "conjugate(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Conjugate(args[0].Compute(z)) } },
-            { "phase(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z).Phase } },
-            { "real(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z).Real } },
+            { "abs)(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "acos)(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "asin(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "atan(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "conjugate(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "phase(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "real(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             // unfortunately there is so many bugs and unfinished parsing that the first letter should be unique to separately operators and constants
-            { "[imag](", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z).Imaginary } },
-            { "polar(", new OperatorInformation{ArgumentCount=2, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.FromPolarCoordinates(args[0].Compute(z).Magnitude, args[1].Compute(z).Magnitude) } },
-            { "cos(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Cos(args[0].Compute(z)) } },
-            { "cosh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Cosh(args[0].Compute(z)) } },
-            { "[exp](", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Exp(args[0].Compute(z)) } },
-            { "log(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Log(args[0].Compute(z)) } },
-            { "log10(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Log10(args[0].Compute(z)) } },
-            { "sin(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sin(args[0].Compute(z)) } },
-            { "sinh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sinh(args[0].Compute(z)) } },
-            { "sqrt(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Sqrt(args[0].Compute(z)) } },
-            { "tan(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Tan(args[0].Compute(z)) } },
-            { "tanh(", new OperatorInformation{ArgumentCount=1, IsOpening=true, function=(Complex z, IComplexFunction[] args) => Complex.Tanh(args[0].Compute(z)) } },
+            { "[imag](", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            //, function=(Complex z, ComplexFunction[] args) => Complex.FromPolarCoordinates((double)args[0].Compute(z).Magnitude, (double)args[1].Compute(z).Magnitude) 
+            { "polar(", new OperatorInformation{ArgumentCount=2, IsOpening=true} },
+            { "cos(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "cosh(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "[exp](", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "log(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "log10(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "sin(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "sinh(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "sqrt(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "tan(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
+            { "tanh(", new OperatorInformation{ArgumentCount=1, IsOpening=true} },
             // important multiplication
-            { "&", new OperatorInformation{Priority=90, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z)*args[1].Compute(z) } },
+            { "&", new OperatorInformation{Priority=90, ArgumentCount=2 } },
             // how to process only the righthandside argument??
             //{ "'", new OperatorInformation{Priority=90, ArgumentCount=1, RightmostEvaluation = true, function=(Complex z, IComplexFunction[] args) => Complex.Conjugate(args[0].Compute(z)) } },
-            { "^", new OperatorInformation{Priority=80, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => Complex.Pow(args[0].Compute(z), args[1].Compute(z)) } },
-            { "*", new OperatorInformation{Priority=60, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z)*args[1].Compute(z) } },
-            { "/", new OperatorInformation{Priority=60, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z)/args[1].Compute(z) } },
-            { "+", new OperatorInformation{Priority=40, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z)+args[1].Compute(z) } },
-            { "-", new OperatorInformation{Priority=40, ArgumentCount=2, function=(Complex z, IComplexFunction[] args) => args[0].Compute(z)-args[1].Compute(z) } },
+            { "^", new OperatorInformation{Priority=80, ArgumentCount=2} },
+            { "*", new OperatorInformation{Priority=60, ArgumentCount=2} },
+            { "/", new OperatorInformation{Priority=60, ArgumentCount=2} },
+            { "+", new OperatorInformation{Priority=40, ArgumentCount=2} },
+            { "-", new OperatorInformation{Priority=40, ArgumentCount=2} },
             { ")", new OperatorInformation{} },
             { "(", new OperatorInformation{IsOpening=true} },
         };
 
         static Dictionary<string, ConstantInformation> constants = new Dictionary<string, ConstantInformation>()
         {
-            { "pi", new ConstantInformation{ complexFunction = new ConstantComplexFunction(Math.PI)} },
-            { "e", new ConstantInformation{ complexFunction = new ConstantComplexFunction(Math.E)} },
-            { "i", new ConstantInformation{ complexFunction = new ConstantComplexFunction(Complex.ImaginaryOne)} },
-            { "_", new ConstantInformation{ complexFunction = new ConstantComplexFunction(-1)} },
-            { "x", new ConstantInformation{ complexFunction = new ArgumentComplexFunction() } },
-            { "z", new ConstantInformation{ complexFunction = new ArgumentComplexFunction() } },
-            { "n", new ConstantInformation{ complexFunction = new RandomComplexFunction() } },
+            { "pi", new ConstantInformation{} },
+            { "e", new ConstantInformation{} },
+            { "i", new ConstantInformation{} },
+            { "_", new ConstantInformation{} },
+            { "x", new ConstantInformation{} },
+            { "z", new ConstantInformation{} },
+            //{ "n", new ConstantInformation{ complexFunction = new RandomComplexFunction() } },
         };
 
         class ParseTreeGenerator
         {
-            Stack<IComplexFunction> ExpressionStack = new Stack<IComplexFunction>();
+            Stack<ComplexFunction.ComplexFunction> ExpressionStack = new Stack<ComplexFunction.ComplexFunction>();
             Stack<int> DeepnessStack = new Stack<int>();
             Queue<string> StringExpressionStack = new Queue<string>();
 
-            public bool TryParseExpression(string expression, out IComplexFunction complexFunction, bool mutable = false)
+            public bool TryParseExpression(string expression, out ComplexFunction.ComplexFunction complexFunction, bool mutable = false)
             {
                 complexFunction = null;
 
@@ -116,11 +117,11 @@ namespace Fractal_Designer
                         //    //= "Could fix the minus...";
                         //}
                         // an unsupported operator
-                        if (operators[expression].function == null || ExpressionStack.Count < operators[expression].ArgumentCount)
+                        if (/*operators[expression].function == null || */ExpressionStack.Count < operators[expression].ArgumentCount)
                             return false;
 
                         // collect the arguments
-                        var arguments = new IComplexFunction[operators[expression].ArgumentCount];
+                        var arguments = new ComplexFunction.ComplexFunction[operators[expression].ArgumentCount];
 
                         // remember about the reverse order!
                         for (int i = operators[expression].ArgumentCount - 1; i >= 0; i--)
@@ -128,14 +129,14 @@ namespace Fractal_Designer
                             arguments[i] = ExpressionStack.Pop();
                         }
 
-                        complexFunction = new ClassicComplexFunction(z => operators[expression].function(z, arguments));
+                        complexFunction = ComplexFunction.Generator.Generate(expression, arguments);
                     }
                 }
                 else
                 {
                     if (constants.ContainsKey(expression))
                     {
-                        complexFunction = constants[expression].complexFunction;
+                        complexFunction = ComplexFunction.Generator.Generate(expression);
                     }
                     else
                     {
@@ -144,7 +145,7 @@ namespace Fractal_Designer
 
                         if (succeededParsing)
                         {
-                            complexFunction = new ConstantComplexFunction(result);
+                            complexFunction = ComplexFunction.Generator.Generate("custom_constant", result);
                         }
                         else
                         {
@@ -162,7 +163,7 @@ namespace Fractal_Designer
 
             public bool Enqueue(string expression)
             {
-                bool succeeded = TryParseExpression(expression, out IComplexFunction complexFunction, true);
+                bool succeeded = TryParseExpression(expression, out ComplexFunction.ComplexFunction complexFunction, true);
 
                 if (succeeded)
                 {
@@ -177,7 +178,7 @@ namespace Fractal_Designer
                 return succeeded;
             }
 
-            public bool TryParseTree(out IComplexFunction returnValue)
+            public bool TryParseTree(out ComplexFunction.ComplexFunction returnValue)
             {
                 if (ExpressionStack.Count == 1)
                 {
@@ -192,7 +193,7 @@ namespace Fractal_Designer
             }
         }
 
-        public static bool TryParse(string formula, out IComplexFunction complexFunction)
+        public static bool TryParse(string formula, out ComplexFunction.ComplexFunction complexFunction)
         {
             var expressionQueue = new ParseTreeGenerator();
             var operatorStack = new Stack<string>();

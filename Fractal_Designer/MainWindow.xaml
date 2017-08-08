@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fractal_Designer"
         mc:Ignorable="d"
-        Title="Fractal Designer" MinWidth="200" MinHeight="200" Height="900" Width="1500" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel"
+        Title="Fractal Designer" MinWidth="200" MinHeight="200" Height="600" Width="1000" SizeChanged="Window_SizeChanged" MouseWheel="Window_MouseWheel"
         WindowStartupLocation="CenterScreen" UseLayoutRounding="True" SnapsToDevicePixels="True" Loaded="Window_Loaded" Icon="Icon.ico">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo ProgressState="Normal" ProgressValue="1"/>
@@ -17,7 +17,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <TextBox Name="Formula" Text="z ^ 3 - 1" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="30" FontFamily="Cambria Math"/>
+            <TextBox Name="Formula" Text="z * z * z - 1" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="30" FontFamily="Cambria Math"/>
         </Grid>
         <!-- what if it were a canvas? -->
         <!--wouldn't it be nice to compare side by side?-->

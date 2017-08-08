@@ -13,9 +13,9 @@ namespace Fractal_Designer
     {
         AlgorithmResult Compute(Complex z);
         int MaximumIterationCount { get; set; }
-        IComplexFunction[] Derivatives { get; set; }
+        ComplexFunction.ComplexFunction[] Derivatives { get; set; }
     }
-    
+
     public interface IParametrizedAlgorithm
     {
         double Parameter { get; set; }
@@ -23,7 +23,7 @@ namespace Fractal_Designer
 
     public interface IFractalFactory
     {
-        IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params IComplexFunction[] Derivatives);
+        IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params ComplexFunction.ComplexFunction[] Derivatives);
     }
 
     public interface IAlgorithmProcessor
@@ -31,12 +31,7 @@ namespace Fractal_Designer
         IFractalAlgorithm FractalAlgorithm { get; set; }
         BitmapSourceResult GetBitmapSourceFromComplexGrid(Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token, bool parallel);
     }
-
-    public interface IComplexFunction
-    {
-        Complex Compute(Complex z);
-    }
-
+    
     public struct BitmapSourceResult
     {
         public BitmapSource bitmap;

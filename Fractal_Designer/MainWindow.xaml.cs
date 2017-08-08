@@ -127,7 +127,7 @@ namespace Fractal_Designer
             if (!IsLoaded)
                 return;
 
-            var succeeded = Interpreter.TryParse(Formula.Text, out IComplexFunction result);
+            var succeeded = Interpreter.TryParse(Formula.Text, out ComplexFunction.ComplexFunction result);
 
             if (succeeded)
             {

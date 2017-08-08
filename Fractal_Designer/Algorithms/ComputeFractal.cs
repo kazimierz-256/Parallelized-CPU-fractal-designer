@@ -11,9 +11,8 @@ namespace Fractal_Designer
 {
     partial class MainWindow
     {
-        IComplexFunction Function = new ClassicComplexFunction(z => z);
-        IComplexFunction AlgorithmFunction;
-        Complex? lastComplexCoordinates;
+        ComplexFunction.ComplexFunction Function = ComplexFunction.Generator.Generate("z");
+        ComplexFunction.ComplexFunction AlgorithmFunction;
         AlgorithmProcessor Colourer;
 
         private Complex GetComplexCoords(Point point, Complex? center = null)
@@ -55,17 +54,19 @@ namespace Fractal_Designer
                 case DragEffect.Move:
                     Settings.Instance.center = CenterLastClicked - (GetComplexCoords(MouseLastMove, CenterLastClicked) - MouseLastClickedComplex);
                     break;
-                case DragEffect.SingleRoot:
-                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) * (z - complexCoordinates));
-                    break;
-                case DragEffect.DoubleRoot:
-                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) * (z - complexCoordinates) * (z - complexCoordinates));
-                    break;
-                case DragEffect.CircularRoot:
-                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) * (z.Magnitude - complexCoordinates.Magnitude));
-                    break;
-                case DragEffect.Singularity:
-                    AlgorithmFunction = new ClassicComplexFunction(z => Function.Compute(z) / (z - complexCoordinates));
+                //case DragEffect.SingleRoot:
+                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) * (z - complexCoordinates));
+                //    break;
+                //case DragEffect.DoubleRoot:
+                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) * (z - complexCoordinates) * (z - complexCoordinates));
+                //    break;
+                //case DragEffect.CircularRoot:
+                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) * (z.Magnitude - complexCoordinates.Magnitude));
+                //    break;
+                //case DragEffect.Singularity:
+                //    AlgorithmFunction = new ArbitraryComplexFunction(z => Function.Compute(z) / (z - complexCoordinates));
+                //    break;
+                default:
                     break;
             }
 
