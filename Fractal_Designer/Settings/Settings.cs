@@ -15,13 +15,15 @@ namespace Fractal_Designer
 {
     public enum Algorithm
     {
-        KazimierzHalleyFractal,
         Halley,
+        Halley_overnewtoned,
+        Quadratic,
         Newton,
-        NewtonWithoutDerivative,
+        Newton_iterative,
+        Secant,
         Inverse,
-        Kazimierz,
         Muller,
+        Steffensen,
     }
 
     public enum DragEffect
@@ -65,8 +67,9 @@ namespace Fractal_Designer
         public static void Reset()
         {
             Instance = new Settings();
-            Save();
-            Recompute();
+
+            Recompute?.Invoke();
+            Save(true);
         }
 
         private static void Load() => Load(out _Instance);
@@ -122,7 +125,7 @@ namespace Fractal_Designer
             }
         }
 
-        private static void Save() => Save(Instance);
+        private static void Save(bool saveImmediately = false) => Save(Instance, saveImmediately);
         private static void Save(Settings programSettings, bool saveImmediately = false)
         {
             if (ForbidSaving || (IsSaving && !saveImmediately))

@@ -9,21 +9,21 @@ using System.Windows.Media.Imaging;
 
 namespace Fractal_Designer
 {
-    public interface IFractalAlgorithm
+    public abstract class FractalAlgorithm
     {
-        AlgorithmResult Compute(Complex z);
-        int MaximumIterationCount { get; set; }
-        ComplexFunction.ComplexFunction[] Derivatives { get; set; }
+        public abstract AlgorithmResult Compute(Complex z);
+        public int MaximumIterationCount { get; set; }
+        public ComplexFunction.ComplexFunction[] Derivatives { get; set; }
     }
 
-    public interface IParametrizedAlgorithm
+    public abstract class ParametrizedFractalAlgorithm : FractalAlgorithm
     {
-        double Parameter { get; set; }
+        public double Parameter { get; set; }
     }
 
     public interface IFractalFactory
     {
-        IFractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params ComplexFunction.ComplexFunction[] Derivatives);
+        FractalAlgorithm GetAutoConfiguredAlgorithmByID(Algorithm algorithmID, params ComplexFunction.ComplexFunction[] Derivatives);
     }
 
     public interface IColorer

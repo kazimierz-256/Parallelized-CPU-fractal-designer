@@ -1,0 +1,350 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Fractal_Designer.AlgorithmProcessor" Collapsed="true">
+    <Position X="50" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAIAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\AlgorithmProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="57" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAEEAAAAgOACAgMAAEEoIAAQAgAACIIIBgAIAAAA=</HashCode>
+      <FileName>Algorithms\ComputeFractal.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFractalFactory" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="53.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.NullAlgorithm" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="55.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.276" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.MullerFractal" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="50" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAIIAgAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.HalleyFractal" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="57" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAIIAgAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.KazimierzHalleyFractal" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="55.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAIIAgAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.NewtonFractal" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="51.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAIIAgAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.NewtonWithoutDerivativeFractal" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="53.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAIIAgAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.KazimierzFractal" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="53.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAIIAgAAAAAgAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.InverseQuadraticFractal" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="51.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAIIAgAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\FractalAlgorithms.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.Interpreter" Collapsed="true">
+    <Position X="50" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAA=</HashCode>
+      <FileName>Algorithms\Interpreter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.App" Collapsed="true">
+    <Position X="51.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.Settings" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="50" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>JSBIgICAEBAABAAAAgCEAQAAgmAAAEQSUAgAAAAIAAQ=</HashCode>
+      <FileName>Settings\Settings.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.SettingsWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="53.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Settings\Settings.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.ComplexFunction" Collapsed="true">
+    <Position X="24" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAIAAAAAAACAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.Generator" Collapsed="true">
+    <Position X="55.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.ArgumentCF" Collapsed="true">
+    <Position X="27.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.ConstantCF" Collapsed="true">
+    <Position X="34.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.DifferenceCF" Collapsed="true">
+    <Position X="41" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.SumCF" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.QuotientCF" Collapsed="true">
+    <Position X="7.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.ProductCF" Collapsed="true">
+    <Position X="14" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.NegateCF" Collapsed="true">
+    <Position X="20.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.SinCF" Collapsed="true">
+    <Position X="29.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.CosCF" Collapsed="true">
+    <Position X="36.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.PowerCF">
+    <Position X="43.25" Y="1.75" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.LogCF" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.Log10CF" Collapsed="true">
+    <Position X="9.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.TanCF" Collapsed="true">
+    <Position X="16.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.SinhCF" Collapsed="true">
+    <Position X="23" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.CoshCF" Collapsed="true">
+    <Position X="32" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.TanhCF" Collapsed="true">
+    <Position X="38.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.SqrtCF" Collapsed="true">
+    <Position X="47.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.ExpCF" Collapsed="true">
+    <Position X="5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.AtanCF" Collapsed="true">
+    <Position X="11.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.AsinCF" Collapsed="true">
+    <Position X="18.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.ComplexFunction.AcosCF" Collapsed="true">
+    <Position X="25.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\ComplexFunction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.Properties.Resources" Collapsed="true">
+    <Position X="57" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAgAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Fractal_Designer.Properties.Settings" Collapsed="true">
+    <Position X="51.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Fractal_Designer.BitmapSourceResult" Collapsed="true">
+    <Position X="51.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAgIAAAAEAAAAAA=</HashCode>
+      <FileName>Algorithms\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Fractal_Designer.AlgorithmResult" Collapsed="true">
+    <Position X="50" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAgAAAAIAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Algorithms\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="Fractal_Designer.IFractalAlgorithm" Collapsed="true">
+    <Position X="51.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAQAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Fractal_Designer.IParametrizedAlgorithm" Collapsed="true">
+    <Position X="55.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Fractal_Designer.IFractalFactory" Collapsed="true">
+    <Position X="53.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Algorithms\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Fractal_Designer.IColorer" Collapsed="true">
+    <Position X="50" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>Algorithms\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="Fractal_Designer.Algorithm" Collapsed="true">
+    <Position X="50" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAIIBAAAAAAAAAAAAAIAAAAAAAAAAEAAAAAAAAAQAAA=</HashCode>
+      <FileName>Settings\Settings.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Fractal_Designer.DragEffect" Collapsed="true">
+    <Position X="51.75" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAABABAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Settings\Settings.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

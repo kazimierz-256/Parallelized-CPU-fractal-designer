@@ -33,8 +33,8 @@
         <Label HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Content="{Binding Path=parameter}"/>
 
         <!--BIND the values! -->
-        <Slider VerticalAlignment="Center" Name="Iterations" Grid.Column="2" Grid.Row="0"  Minimum="0" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Value="{Binding Path=iterations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Slider VerticalAlignment="Center" Name="Parameter"  Grid.Column="2" Grid.Row="1" Minimum="-1" Maximum="3" TickFrequency="0.1" IsSnapToTickEnabled="True" Value="{Binding Path=parameter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Slider VerticalAlignment="Center" Name="Iterations" Grid.Column="2" Grid.Row="0"  Minimum="0" Maximum="200" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Path=iterations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Slider VerticalAlignment="Center" Name="Parameter"  Grid.Column="2" Grid.Row="1" Minimum="-1" Maximum="3" TickFrequency="0.01" IsSnapToTickEnabled="True" Value="{Binding Path=parameter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <ComboBox Name="DragEffectComboBox"  MaxHeight="30" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="2" VerticalContentAlignment="Center" Margin="5" SelectedIndex="{Binding Path=drageffect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 

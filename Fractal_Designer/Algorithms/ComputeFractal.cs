@@ -35,13 +35,13 @@ namespace Fractal_Designer
             if (center == null)
             {
                 double realPosition = Settings.Instance.Center.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
-                double imaginaryPosition = Settings.Instance.Center.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                double imaginaryPosition = Settings.Instance.Center.Imaginary - (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
                 return new Complex(realPosition, imaginaryPosition);
             }
             else
             {
                 double realPosition = center.Value.Real + (re * 2d - lengthReal) / lengthReal * radiusReal;
-                double imaginaryPosition = center.Value.Imaginary + (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                double imaginaryPosition = center.Value.Imaginary - (im * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
                 return new Complex(realPosition, imaginaryPosition);
             }
         }

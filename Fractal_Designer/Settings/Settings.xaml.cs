@@ -28,15 +28,19 @@ namespace Fractal_Designer
 
             foreach (var DragEffectName in Enum.GetNames(typeof(DragEffect)))
             {
-                DragEffectComboBox.Items.Add(new ComboBoxItem() { Content = DragEffectName });
+                DragEffectComboBox.Items.Add(new ComboBoxItem() { Content = DragEffectName.Replace('_', ' ') });
             }
 
             foreach (var AlgorithmName in Enum.GetNames(typeof(Algorithm)))
             {
-                AlgorithmComboBox.Items.Add(new ComboBoxItem() { Content = AlgorithmName });
+                AlgorithmComboBox.Items.Add(new ComboBoxItem() { Content = AlgorithmName.Replace('_', ' ') });
             }
         }
 
-        private void Reset(object sender, RoutedEventArgs e) => Settings.Reset();
+        private void Reset(object sender, RoutedEventArgs e)
+        {
+            Settings.Reset();
+            DataContext = Settings.Instance;
+        }
     }
 }

@@ -13,9 +13,9 @@ namespace Fractal_Designer
 {
     public class AlgorithmProcessor
     {
-        public IFractalAlgorithm FractalAlgorithm { get; set; }
+        public FractalAlgorithm FractalAlgorithm { get; set; }
 
-        public AlgorithmProcessor(IFractalAlgorithm fractalAlgorithm) =>
+        public AlgorithmProcessor(FractalAlgorithm fractalAlgorithm) =>
             FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
 
         public BitmapSourceResult GetBitmapSourceFromComplexGrid(IColorer colorer, Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken(), bool parallel = false)
@@ -97,7 +97,7 @@ namespace Fractal_Designer
                 {
                     // compute the location like in a grid (could be image-based but who wants it?)
                     double realPosition = center.Real + ((re + .5) * 2d - lengthReal) / lengthReal * radiusReal;
-                    double imaginaryPosition = center.Imaginary + ((im + .5) * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
+                    double imaginaryPosition = center.Imaginary - ((im + .5) * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
 
                     // compute the end result
                     results[re, im] = FractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
