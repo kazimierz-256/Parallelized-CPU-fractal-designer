@@ -52,7 +52,7 @@ namespace Fractal_Designer
 
         private void Fractal_MouseMove(object sender, MouseEventArgs e)
         {
-            Fractal.Cursor = Settings.Instance.drageffect == 0 ? Cursors.Hand : Cursors.Cross;
+            //Fractal.Cursor = Settings.Instance.drageffect == 0 ? Cursors.Hand : Cursors.Cross;
 
             MouseLastMove = Mouse.GetPosition(Fractal);
             MouseLastMovedComplex = GetComplexCoords(MouseLastMove);
@@ -61,19 +61,29 @@ namespace Fractal_Designer
             if (Mouse.LeftButton == MouseButtonState.Pressed)
                 ComputeFractal(MouseLastMovedComplex);
 
-            var bitmapSourceResult = (BitmapSourceResult)(sender as Image).Tag;
-            int re = (int)(MouseLastMove.X * (bitmapSourceResult.bitmap.PixelWidth) / Fractal.Width);
-            int im = (int)(MouseLastMove.Y * (bitmapSourceResult.bitmap.PixelHeight) / Fractal.Height);
+            var bitmapSourceResult = (BitmapSourceResult)Fractal.Tag;
 
-            if (bitmapSourceResult.results == null || re < 0 || im < 0 || re >= bitmapSourceResult.results.GetLength(0) || im >= bitmapSourceResult.results.GetLength(1))
+            var timesSmaller = bitmapSourceResult.timesSmaller;
+
+            int re = (int)(MouseLastMove.X * bitmapSourceResult.results.GetLength(0) / Fractal.ActualWidth);
+            int im =/* bitmapSourceResult.bitmap.PixelHeight -*/ (int)(MouseLastMove.Y * bitmapSourceResult.results.GetLength(1) / Fractal.ActualHeight);
+
+            if (bitmapSourceResult.results == null)
                 return;
 
-            var result = bitmapSourceResult.results[re, im];
+            var roundedRE = Math.Min((int)(Math.Round(re / timesSmaller) * timesSmaller), (int)((bitmapSourceResult.bitmap.PixelWidth - 1) * timesSmaller));
+            var roundedIM = Math.Min((int)((Math.Round(im / timesSmaller) * timesSmaller)), (int)((bitmapSourceResult.bitmap.PixelHeight - 1) * timesSmaller));
+
+            if (re < 0 || im < 0 ||
+                re >= bitmapSourceResult.results.GetLength(0) || im >= bitmapSourceResult.results.GetLength(1))
+                return;
+
+            var result = bitmapSourceResult.results[roundedRE, roundedIM];
 
             if (result.succeeded)
-                Status.Text = $"Radius={Settings.Instance.Radius}{Environment.NewLine}Iterations={result.iterations}{Environment.NewLine}Result={result.z}{Environment.NewLine}f(Result)={Function.Compute(result.z)}{Environment.NewLine}Position={MouseLastMovedComplex}";
+                Status.Text = $"Radius={Settings.Instance.Radius}, Times smaller={timesSmaller}, Iterations={result.iterations}{Environment.NewLine}Result={result.z}{Environment.NewLine}f(Result)={Function.Compute(result.z)}{Environment.NewLine}Position={MouseLastMovedComplex}";
             else
-                Status.Text = $"Radius={Settings.Instance.Radius}{Environment.NewLine}Iterations={result.iterations} (fail){Environment.NewLine}Position={MouseLastMovedComplex}";
+                Status.Text = $"Radius={Settings.Instance.Radius}, Times smaller={timesSmaller}, Iterations={result.iterations} (fail){Environment.NewLine}Position={MouseLastMovedComplex}";
         }
 
         private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -131,9 +141,9 @@ namespace Fractal_Designer
 
             if (succeeded)
             {
-                Function = result;
+                AlgorithmFunction = Function = result;
                 RecomputeFractal();
-                Formula.Foreground = Brushes.Black;
+                Formula.Foreground = Brushes.White;
             }
             else
             {
@@ -142,5 +152,8 @@ namespace Fractal_Designer
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) => Interpret();
+
+        private void StackPanel_MouseDown(object sender, MouseButtonEventArgs e) => DragMove();
+
     }
 }

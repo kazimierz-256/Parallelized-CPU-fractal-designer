@@ -10,20 +10,20 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo ProgressState="Normal" ProgressValue="1"/>
     </Window.TaskbarItemInfo>
+    
     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <TextBox Name="Formula" Text="z ^ 4 - i" Padding="10" TextChanged="Interpret" TextAlignment="Center" FontSize="30" FontFamily="Cambria Math"/>
-        </Grid>
-        <!-- what if it were a canvas? -->
-        <!--wouldn't it be nice to compare side by side?-->
-        <Grid Grid.Row="1" Name="Hope">
-            <Image Name="Fractal" Stretch="UniformToFill" MouseDown="Fractal_MouseDown" MouseMove="Fractal_MouseMove"
-                   MouseLeave="Fractal_MouseLeave" Cursor="Cross" RenderOptions.BitmapScalingMode="LowQuality">
+
+        <TextBox Grid.Row="0" Panel.ZIndex="10" Height="80" VerticalAlignment="Top" BorderThickness="0" HorizontalAlignment="Center" Name="Formula" Text="z ^ 4 - 1" Padding="30 10" TextChanged="Interpret" TextAlignment="Center" VerticalContentAlignment="Center" FontSize="30" FontFamily="Cambria Math" Background="#55FFFFFF">
+            <TextBox.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="0"/>
+            </TextBox.Effect>
+        </TextBox>
+
+        <Grid Grid.Row="0" Name="Hope" Panel.ZIndex="9">
+            <Image Name="Fractal" Stretch="UniformToFill" MouseDown="Fractal_MouseDown" MouseMove="Fractal_MouseMove" MouseLeave="Fractal_MouseLeave" Cursor="Cross" RenderOptions.BitmapScalingMode="LowQuality">
                 <Image.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Settings" Click="OpenSettings"/>
@@ -35,8 +35,15 @@
             </Image>
         </Grid>
 
-        <StackPanel Grid.Row="2" Orientation="Vertical">
-            <TextBlock Name="Status" Padding="5"/>
+        <StackPanel Cursor="Hand" MouseDown="StackPanel_MouseDown" Background="#55FFFFFF" Grid.Row="0" Panel.ZIndex="11" Orientation="Vertical" VerticalAlignment="Bottom">
+            <StackPanel.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="0"/>
+            </StackPanel.Effect>
+            <TextBlock Name="Status" Foreground="White" Padding="5">
+                <TextBlock.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="0"/>
+                </TextBlock.Effect>
+            </TextBlock>
             <ProgressBar Name="Progress" Maximum="1" Height="10" LargeChange="0.1"/>
         </StackPanel>
     </Grid>

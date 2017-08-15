@@ -71,6 +71,7 @@ namespace Fractal_Designer
                     AlgorithmFunction = Function;
                     break;
                 default:
+                    AlgorithmFunction = Function;
                     break;
             }
 

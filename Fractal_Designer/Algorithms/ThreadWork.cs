@@ -18,12 +18,12 @@ namespace Fractal_Designer
         Stack<CancellationTokenSource> tokens = new Stack<CancellationTokenSource>();
         ulong currentTaskID = 0;
 
-        private void AsyncDraw(AlgorithmProcessor colourer, Complex center, double radius, int width, int height)
+        private void AsyncDraw(AlgorithmProcessor algorithmProcessor, Complex center, double radius, int width, int height)
         {
             if (tokens.Count > 0 && !tokens.Peek().IsCancellationRequested)
             {
                 tokens.Peek().Cancel();
-                tokens.Peek().Dispose();
+                //tokens.Peek().Dispose();
                 ++currentTaskID;
             }
 
@@ -32,32 +32,13 @@ namespace Fractal_Designer
 
             Task.Factory.StartNew(() =>
             {
-                const double parallelThreshold = 9;
                 var colorer = new AlgorithmProcessor.Colourful();
 
-                foreach (var divisor in new double[] { 243, 81, 27, 9, 3, 1, .5 })
-                    GetBitmapAndReport(colorer, divisor, divisor <= parallelThreshold);
+                algorithmProcessor.GetBitmapSourceFromComplexGrid(
+                    colorer, center, radius, width * 4, height * 4, currentTaskID, Report, token.Token);
 
             }, token.Token).ContinueWith(new Action<Task>(t => t.Dispose()), token.Token);
 
-            void GetBitmapAndReport(IColorer colorer, double divisor, bool parallel)
-            {
-                if (token.IsCancellationRequested)
-                    return;
-
-                var result = colourer.GetBitmapSourceFromComplexGrid(colorer, center, radius, (int)(width / divisor), (int)(height / divisor), token.Token, parallel);
-
-                if (token.IsCancellationRequested)
-                    return;
-
-                if (result.bitmap != null)
-                {
-                    result.taskID = currentTaskID;
-                    result.timesSmaller = divisor;
-
-                    Report(result);
-                }
-            }// end GetBitmapAndReport
 
             void Report(BitmapSourceResult result)
             {
@@ -69,8 +50,6 @@ namespace Fractal_Designer
                         {
                             Fractal.Source = result.bitmap;
                             Fractal.Tag = result;
-
-                            Status.Text = $"#{result.timesSmaller} times smaller ({result.taskID})";
                         }
                     }
 

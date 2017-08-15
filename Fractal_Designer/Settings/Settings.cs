@@ -17,12 +17,17 @@ namespace Fractal_Designer
     {
         Halley,
         Halley_overnewtoned,
+        Halley_without_derivative,
+        Quadruple,
         Quadratic,
+        Quadratic_without_derivative,
         Newton,
-        Newton_iterative,
+        Newton_without_derivative,
+        Secant_Newton_combination,
         Secant,
         Inverse,
         Muller,
+        Moler_real,
         Steffensen,
     }
 
@@ -357,7 +362,7 @@ namespace Fractal_Designer
                 if (!ForbidRefresh)
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("drageffect"));
-                    Recompute?.Invoke();
+                    //Recompute?.Invoke();
                     Save(this);
                 }
             }

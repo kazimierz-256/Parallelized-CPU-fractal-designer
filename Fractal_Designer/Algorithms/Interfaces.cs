@@ -44,6 +44,8 @@ namespace Fractal_Designer
         public Complex z;
         public int iterations;
         public bool succeeded;
+        public bool computed;
         public double orderOfConvergence;
+        public (byte R, byte G, byte B) color;
     }
 }
