@@ -18,26 +18,39 @@ namespace Fractal_Designer
         Halley,
         Halley_overnewtoned,
         Halley_without_derivative,
+
         Quadruple,
         Quadratic,
         Quadratic_without_derivative,
+
         Newton,
         Newton_without_derivative,
         Secant_Newton_combination,
         Secant,
+
         Inverse,
         Muller,
         Moler_real,
         Steffensen,
+
+        Custom,
     }
 
     public enum DragEffect
     {
         Move,
+
         SingleRoot,
-        Singularity,
         DoubleRoot,
+        Singularity,
+
         Reset,
+    }
+
+    public enum Colorer
+    {
+        Root_phase,
+        Iterations,
     }
 
     public partial class Settings
@@ -185,27 +198,31 @@ namespace Fractal_Designer
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
     public partial class Settings : INotifyPropertyChanged
     {
-        private decimal radiusField = 1;
-        private decimal centerrealField = 0;
-        private decimal centerimaginaryField = 0;
-        private decimal parameterField = 1;
-        private ushort iterationsField = 100;
-        private ushort drageffectField = 0;
-        private ushort algorithmField = 0;
+        private decimal _radius = 1;
+        private decimal _centerreal = 0;
+        private decimal _centerimaginary = 0;
+        private decimal _parameters = 1;
+        private ushort _iterations = 100;
+        private ushort _drageffect = 0;
+        private ushort _algorithm = 0;
+        private decimal _delta = -15;
+        private decimal _eps = -10;
+        private decimal _epseps = -15;
+        private ushort _colorer = 0;
 
         public decimal radiusD
         {
-            get => radiusField;
+            get => _radius;
             set
             {
-                if (value == radiusField)
+                if (value == _radius)
                     return;
 
                 _Radius = (double)value;
-                radiusField = value;
+                _radius = value;
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("radius"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(radiusD)));
                     Recompute?.Invoke();
                     Save(this);
                 }
@@ -231,7 +248,7 @@ namespace Fractal_Designer
                     radiusD = (decimal)value;
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Radius"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Radius)));
                     Recompute?.Invoke();
                     Save(this);
                 }
@@ -240,18 +257,18 @@ namespace Fractal_Designer
 
         public decimal centerreal
         {
-            get => centerrealField;
+            get => _centerreal;
             set
             {
-                if (value == centerrealField)
+                if (value == _centerreal)
                     return;
 
-                centerrealField = value;
-                CenterSaved = new Complex((double)centerrealField, (double)centerimaginaryField);
+                _centerreal = value;
+                CenterSaved = new Complex((double)_centerreal, (double)_centerimaginary);
 
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerreal"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(centerreal)));
                     Recompute?.Invoke();
                     Save(this);
                 }
@@ -260,18 +277,18 @@ namespace Fractal_Designer
 
         public decimal centerimaginary
         {
-            get => centerimaginaryField;
+            get => _centerimaginary;
             set
             {
-                if (value == centerimaginaryField)
+                if (value == _centerimaginary)
                     return;
 
-                centerimaginaryField = value;
-                CenterSaved = new Complex((double)centerrealField, (double)centerimaginaryField);
+                _centerimaginary = value;
+                CenterSaved = new Complex((double)_centerreal, (double)_centerimaginary);
 
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerimaginary"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(centerimaginary)));
                     Recompute?.Invoke();
                     Save(this);
                 }
@@ -294,17 +311,17 @@ namespace Fractal_Designer
                 if (value.Imaginary < (double)decimalizedImaginary)
                     decimalizedImaginary = (decimal)value.Real;
 
-                if (decimalizedReal == Instance.centerrealField && decimalizedImaginary == Instance.centerimaginaryField)
+                if (decimalizedReal == Instance._centerreal && decimalizedImaginary == Instance._centerimaginary)
                     return;
 
-                Instance.centerrealField = decimalizedReal;
+                Instance._centerreal = decimalizedReal;
                 Instance.centerimaginary = decimalizedImaginary;
                 CenterSaved = value;
 
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerreal"));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("centerimaginary"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(centerreal)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(centerimaginary)));
                     Recompute?.Invoke();
                     Save();
                 }
@@ -313,17 +330,74 @@ namespace Fractal_Designer
 
         public decimal parameter
         {
-            get => parameterField;
+            get => _parameters;
             set
             {
-                if (value == parameterField)
+                if (value == _parameters)
                     return;
 
-                parameterField = value;
+                _parameters = value;
 
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("parameter"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(parameter)));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
+            }
+        }
+
+        public decimal eps
+        {
+            get => _eps;
+            set
+            {
+                if (value == _eps)
+                    return;
+
+                _eps = value;
+
+                if (!ForbidRefresh)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(eps)));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
+            }
+        }
+
+        public decimal delta
+        {
+            get => _delta;
+            set
+            {
+                if (value == _delta)
+                    return;
+
+                _delta = value;
+
+                if (!ForbidRefresh)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(delta)));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
+            }
+        }
+
+        public decimal epseps
+        {
+            get => _epseps;
+            set
+            {
+                if (value == _epseps)
+                    return;
+
+                _epseps = value;
+
+                if (!ForbidRefresh)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(epseps)));
                     Recompute?.Invoke();
                     Save(this);
                 }
@@ -332,17 +406,17 @@ namespace Fractal_Designer
 
         public ushort iterations
         {
-            get => iterationsField;
+            get => _iterations;
             set
             {
-                if (value == iterationsField)
+                if (value == _iterations)
                     return;
 
-                iterationsField = value;
+                _iterations = value;
 
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("iterations"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(iterations)));
                     Recompute?.Invoke();
                     Save(this);
                 }
@@ -351,17 +425,17 @@ namespace Fractal_Designer
 
         public ushort drageffect
         {
-            get => drageffectField;
+            get => _drageffect;
             set
             {
-                if (value == drageffectField)
+                if (value == _drageffect)
                     return;
 
-                drageffectField = value;
+                _drageffect = value;
 
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("drageffect"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(drageffect)));
                     //Recompute?.Invoke();
                     Save(this);
                 }
@@ -370,17 +444,36 @@ namespace Fractal_Designer
 
         public ushort algorithm
         {
-            get => algorithmField;
+            get => _algorithm;
             set
             {
-                if (value == algorithmField)
+                if (value == _algorithm)
                     return;
 
-                algorithmField = value;
+                _algorithm = value;
 
                 if (!ForbidRefresh)
                 {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("algorithm"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(algorithm)));
+                    Recompute?.Invoke();
+                    Save(this);
+                }
+            }
+        }
+
+        public ushort colorer
+        {
+            get => _colorer;
+            set
+            {
+                if (value == _colorer)
+                    return;
+
+                _colorer = value;
+
+                if (!ForbidRefresh)
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(colorer)));
                     Recompute?.Invoke();
                     Save(this);
                 }

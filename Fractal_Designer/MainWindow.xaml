@@ -21,13 +21,17 @@
                 <DropShadowEffect BlurRadius="10" ShadowDepth="0"/>
             </TextBox.Effect>
         </TextBox>
-
+        
         <Grid Grid.Row="0" Name="Hope" Panel.ZIndex="9">
             <Image Name="Fractal" Stretch="UniformToFill" MouseDown="Fractal_MouseDown" MouseMove="Fractal_MouseMove" MouseLeave="Fractal_MouseLeave" Cursor="Cross" RenderOptions.BitmapScalingMode="LowQuality">
                 <Image.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Name="ContextMenuAlgorithms"  Header="Algorithm"/>
+                        <MenuItem Name="ContextMenuDragEffects" Header="Drag effect"/>
+                        <MenuItem Name="ContextMenuColorer" Header="Colorer"/>
                         <MenuItem Header="Settings" Click="OpenSettings"/>
-                        <MenuItem Header="Export"/>
+                        <MenuItem Header="Reset settings" Click="ResetSettings"/>
+                        <MenuItem Header="Export" IsEnabled="False"/>
                         <Separator/>
                         <MenuItem Header="Exit" Click="Exit"/>
                     </ContextMenu>

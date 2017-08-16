@@ -4,7 +4,9 @@
   <centerreal>-0.00966936031181874</centerreal>
   <centerimaginary>-0.00524072710804903</centerimaginary>
   <parameter>1</parameter>
-  <iterations>200</iterations>
+  <eps>-4</eps>
+  <epseps>-10</epseps>
+  <delta>-20</delta>
   <drageffect>0</drageffect>
   <algorithm>1</algorithm>
 </Settings>

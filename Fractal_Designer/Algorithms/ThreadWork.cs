@@ -32,10 +32,8 @@ namespace Fractal_Designer
 
             Task.Factory.StartNew(() =>
             {
-                var colorer = new AlgorithmProcessor.Colourful();
-
                 algorithmProcessor.GetBitmapSourceFromComplexGrid(
-                    colorer, center, radius, width * 4, height * 4, currentTaskID, Report, token.Token);
+                    center, radius, width * 2, height * 2, currentTaskID, Report, token.Token);
 
             }, token.Token).ContinueWith(new Action<Task>(t => t.Dispose()), token.Token);
 

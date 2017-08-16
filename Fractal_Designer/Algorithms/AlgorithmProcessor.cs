@@ -18,106 +18,9 @@ namespace Fractal_Designer
         public AlgorithmProcessor(FractalAlgorithm fractalAlgorithm) =>
             FractalAlgorithm = fractalAlgorithm ?? throw new ArgumentNullException("Brak algorytmu.");
 
-        //public BitmapSourceResult GetBitmapSourceFromComplexGrid(IColorer colorer, Complex center, double radius, int lengthReal, int lengthImaginary, CancellationToken token = new CancellationToken(), bool parallel = false)
-        //{
-        //    if (lengthReal == 0 || lengthImaginary == 0)
-        //        return new BitmapSourceResult { bitmap = null, results = null };
-
-        //    double eps10 = Math.Pow(2, -10);
-
-        //    PixelFormat pixelFormat = PixelFormats.Bgr32;
-        //    int stride = (lengthReal * pixelFormat.BitsPerPixel + 7) / 8;
-        //    var fractal = new byte[stride * lengthImaginary];
-        //    var results = new AlgorithmResult[lengthReal, lengthImaginary];
-
-        //    double radiusReal = radius;
-        //    double radiusImaginary = radius * lengthImaginary / lengthReal;
-
-        //    // best-fit window, if in portrait mode
-        //    if (lengthReal < lengthImaginary)
-        //    {
-        //        radiusReal = radius * lengthReal / lengthImaginary;
-        //        radiusImaginary = radius;
-        //    }
-
-        //    if (parallel)
-        //    {
-        //        // minus one because of the UI thread
-        //        int completedRows = 0;
-
-        //        ShowProgress(0, completedRows / lengthReal);
-
-        //        System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
-        //        {
-        //            if (System.Windows.Application.Current.MainWindow.TaskbarItemInfo != null)
-        //                System.Windows.Application.Current.MainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
-        //        }));
-
-        //        Parallel.For(0, lengthReal, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount - 1 }, (re, loopstate) =>
-        //            {
-        //                if (token.IsCancellationRequested)
-        //                    loopstate.Break();
-        //                else
-        //                {
-        //                    ComputeRow(re);
-        //                    Interlocked.Increment(ref completedRows);
-        //                    ShowProgress(completedRows, completedRows / lengthReal);
-        //                }
-        //            });
-
-        //        ShowProgress(0, completedRows / lengthReal);
-
-        //        System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
-        //        {
-        //            if (System.Windows.Application.Current?.MainWindow?.TaskbarItemInfo != null)
-        //                System.Windows.Application.Current.MainWindow.TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
-        //        }));
-
-        //        if (token.IsCancellationRequested)
-        //            return new BitmapSourceResult { bitmap = null, results = null };
-        //    }
-        //    else
-        //    {
-        //        for (int re = 0; re < lengthReal; ++re)
-        //        {
-        //            if (token.IsCancellationRequested)
-        //                return new BitmapSourceResult { bitmap = null, results = null };
-
-        //            ComputeRow(re);
-        //        }
-        //    }
-
-        //    var bitmap = BitmapSource.Create(lengthReal, lengthImaginary, 96, 96, pixelFormat, null, fractal, stride);
-        //    bitmap.Freeze();
-        //    return new BitmapSourceResult { bitmap = bitmap, results = results };
-
-        //    void ComputeRow(int re)
-        //    {
-        //        for (int im = 0; im < lengthImaginary; ++im)
-        //        {
-        //            // compute the location like in a grid (could be image-based but who wants it?)
-        //            double realPosition = center.Real + ((re + .5) * 2d - lengthReal) / lengthReal * radiusReal;
-        //            double imaginaryPosition = center.Imaginary - ((im + .5) * 2d - lengthImaginary) / lengthImaginary * radiusImaginary;
-
-        //            // compute the end result
-        //            results[re, im] = FractalAlgorithm.Compute(new Complex(realPosition, imaginaryPosition));
-
-        //            if (results[re, im].succeeded)
-        //            {
-        //                (byte R, byte G, byte B) color = colorer.Colour(results[re, im]);
-
-        //                fractal[4 * (lengthReal * im + re)] = color.B;
-        //                fractal[4 * (lengthReal * im + re) + 1] = color.G;
-        //                fractal[4 * (lengthReal * im + re) + 2] = color.R;
-        //            }
-        //            // else zeroes
-
-        //        }
-        //    }
-        //}
-
-        public void GetBitmapSourceFromComplexGrid(IColorer colorer, Complex center, double radius, int width, int height, ulong taskID, Action<BitmapSourceResult> performUpdate, CancellationToken token = new CancellationToken())
+        public void GetBitmapSourceFromComplexGrid(Complex center, double radius, int width, int height, ulong taskID, Action<BitmapSourceResult> performUpdate, CancellationToken token = new CancellationToken())
         {
+            Colorer colorer = GetColorer(Settings.Instance.colorer);
             PixelFormat pixelFormat = PixelFormats.Bgr32;
             var results = new AlgorithmResult[width, height];
 
@@ -131,9 +34,9 @@ namespace Fractal_Designer
                 radiusImaginary = radius;
             }
 
-            //parallelize
-            const int parallelThreshold = 32;
-            for (int delta = 1024; delta >= 1; delta /= 2)
+            const int parallelThreshold = 64;
+
+            for (int delta = 2048; delta >= 1; delta >>= 1)
             {
                 var localWidth = width / delta;
                 var localHeight = height / delta;
@@ -166,7 +69,7 @@ namespace Fractal_Designer
                                 loopstate.Break();
                             else
                             {
-                                re *= delta;
+                                re = re * delta;
                                 for (int im = 0; im < delta * localHeight; im += delta)
                                 {
                                     if (!results[re, im].computed)
@@ -180,10 +83,9 @@ namespace Fractal_Designer
                                         results[re, im].computed = true;
 
                                         if (results[re, im].succeeded)
-                                            results[re, im].color = colorer.Colour(results[re, im]);
+                                            results[re, im].color = colorer.Color(results[re, im]);
 
                                     }
-
 
                                     var position = bytesPerPixel * (localWidth * (im / delta) + re / delta);
 
@@ -209,12 +111,12 @@ namespace Fractal_Designer
                 }
                 else
                 {
-                    for (int re = 0; re < delta * localWidth; re += delta)
+                    for (int re = delta / 2; re < delta * localWidth; re += delta)
                     {
                         if (token.IsCancellationRequested)
                             return;
 
-                        for (int im = 0; im < delta * localHeight; im += delta)
+                        for (int im = delta / 2; im < delta * localHeight; im += delta)
                         {
                             if (!results[re, im].computed)
                             {
@@ -227,9 +129,8 @@ namespace Fractal_Designer
                                 results[re, im].computed = true;
 
                                 if (results[re, im].succeeded)
-                                    results[re, im].color = colorer.Colour(results[re, im]);
+                                    results[re, im].color = colorer.Color(results[re, im]);
                             }
-
 
                             var position = bytesPerPixel * (localWidth * (im / delta) + re / delta);
 
@@ -259,6 +160,19 @@ namespace Fractal_Designer
 
         }
 
+        private Colorer GetColorer(ushort colorer)
+        {
+            switch ((Colorer) colorer)
+            {
+                case Colorer.Root_phase:
+                    return new RootPhaseColorer();
+                case Colorer.Iterations:
+                    return new IterationsColorer();
+                default:
+                    return null;
+            }
+        }
+
         void ShowProgress(int completedRows, double ratio)
         {
             System.Windows.Application.Current?.Dispatcher.BeginInvoke(new Action(() =>
@@ -274,36 +188,30 @@ namespace Fractal_Designer
             }));
         }
 
-        public class Colourful : IColorer
+
+        public class RootPhaseColorer : Colorer
         {
             static double eps10 = Math.Pow(2, -10);
-            public (byte R, byte G, byte B) Colour(AlgorithmResult result)
+            public override (byte R, byte G, byte B) Color(AlgorithmResult result)
             {
                 double abs = result.z.Magnitude;
                 double hue = 180d * (result.z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
                 int iterationsSquared = result.iterations * result.iterations;
                 double saturation = 700d / (800d + Math.Log(result.iterations)) * (1 - eps10 / (eps10 + abs * abs));
-                double value = 180d / (200d + iterationsSquared);
-                
+                double value = 10d / (10d + result.iterations);
+
                 return ColorFromHSV(hue, saturation, value);
             }
         }
 
-        // TODO
-        //public class Bluish : IColorer
-        //{
-        //    static double eps10 = Math.Pow(2, -10);
-        //    public (byte R, byte G, byte B) Colour(AlgorithmResult result)
-        //    {
-        //        double abs = result.z.Magnitude;
-        //        double hue = 180d * (result.z.Phase + Math.PI) / Math.PI;//(360/2) * ..., don't worry, overflow is allowed
-        //        int iterationsSquared = result.iterations * result.iterations;
-        //        double saturation = 700d / (800d + Math.Log(result.iterations)) * (1 - eps10 / (eps10 + abs * abs));
-        //        double value = 180d / (200d + iterationsSquared);
-
-        //        return ColorFromHSV(hue, saturation, value);
-        //    }
-        //}
+        public class IterationsColorer : Colorer
+        {
+            public override (byte R, byte G, byte B) Color(AlgorithmResult result)
+            {
+                double iter = Math.Pow(result.iterations, 1.4);
+                return ((byte)(255d * 10d / (10d + iter)), (byte)(255d * 70d / (70d + iter)), (byte)(255d * 300d / (300d + iter)));
+            }
+        }
 
         private static (byte R, byte G, byte B) ColorFromHSV(double hue, double saturation, double value)
         {

@@ -7,7 +7,7 @@
   <xsd:element name="Settings">
     <xsd:complexType>
       <xsd:sequence>
-        
+
         <xsd:element name="radiusD"
                      type="xsd:decimal" />
         <xsd:element name="centerreal"
@@ -16,11 +16,19 @@
                      type="xsd:decimal" />
         <xsd:element name="parameter"
                      type="xsd:decimal" />
+        <xsd:element name="eps"
+                     type="xsd:decimal" />
+        <xsd:element name="delta"
+                     type="xsd:decimal" />
+        <xsd:element name="epseps"
+                     type="xsd:decimal" />
         <xsd:element name="iterations"
                      type="xsd:unsignedShort" />
         <xsd:element name="drageffect"
                      type="xsd:unsignedShort" />
         <xsd:element name="algorithm"
+                     type="xsd:unsignedShort" />
+        <xsd:element name="colorer"
                      type="xsd:unsignedShort" />
       </xsd:sequence>
     </xsd:complexType>

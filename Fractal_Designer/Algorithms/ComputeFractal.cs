@@ -13,7 +13,7 @@ namespace Fractal_Designer
     {
         ComplexFunction.ComplexFunction Function = ComplexFunction.Generator.Generate("z");
         ComplexFunction.ComplexFunction AlgorithmFunction;
-        AlgorithmProcessor Colourer;
+        AlgorithmProcessor Colorer;
 
         private Complex GetComplexCoords(Point point, Complex? center = null)
         {
@@ -84,9 +84,10 @@ namespace Fractal_Designer
                 return;
 
             var fractalFactory = new ComplexFractalFactory();
-            Colourer = new AlgorithmProcessor(fractalFactory.GetAutoConfiguredAlgorithmByID((Algorithm)Settings.Instance.algorithm, AlgorithmFunction ?? Function));
+            Colorer = new AlgorithmProcessor(fractalFactory.GetAutoConfiguredAlgorithmByID((Algorithm)Settings.Instance.algorithm,
+                AlgorithmFunction ?? Function));
 
-            AsyncDraw(Colourer, Settings.Instance.Center, Settings.Instance.Radius, (int)Fractal.Width, (int)Fractal.Height);
+            AsyncDraw(Colorer, Settings.Instance.Center, Settings.Instance.Radius, (int)Fractal.Width, (int)Fractal.Height);
 
             Status.Text = $"Radius={Settings.Instance.Radius}";
         }

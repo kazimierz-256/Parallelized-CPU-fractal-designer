@@ -35,6 +35,49 @@ namespace Fractal_Designer
             InitializeComponent();
 
             Settings.Recompute += RecomputeFractal;
+
+            foreach (var DragEffectName in Enum.GetNames(typeof(DragEffect)))
+            {
+                var menuItem = new MenuItem()
+                {
+                    Header = DragEffectName.Replace('_', ' '),
+                    Tag = (ushort)((int)Enum.Parse(typeof(DragEffect), DragEffectName)),
+                };
+
+                if (DragEffectName == "Reset")
+                    menuItem.Click += (object sender, RoutedEventArgs e) =>
+                        {
+                            AlgorithmFunction = Function;
+                            RecomputeFractal();
+                        };
+                else
+                    menuItem.Click += (object sender, RoutedEventArgs e) => Settings.Instance.drageffect = (ushort)((sender as MenuItem).Tag);
+
+                ContextMenuDragEffects.Items.Add(menuItem);
+            }
+
+            foreach (var DragEffectName in Enum.GetNames(typeof(Algorithm)))
+            {
+                var menuItem = new MenuItem()
+                {
+                    Header = DragEffectName.Replace('_', ' '),
+                    Tag = (ushort)((int)Enum.Parse(typeof(Algorithm), DragEffectName)),
+                };
+                menuItem.Click += (object sender, RoutedEventArgs e) => Settings.Instance.algorithm = (ushort)((sender as MenuItem).Tag);
+                ContextMenuAlgorithms.Items.Add(menuItem);
+            }
+
+            foreach (var DragEffectName in Enum.GetNames(typeof(Colorer)))
+            {
+                var menuItem = new MenuItem()
+                {
+                    Header = DragEffectName.Replace('_', ' '),
+                    Tag = (ushort)((int)Enum.Parse(typeof(Colorer), DragEffectName)),
+                };
+                menuItem.Click += (object sender, RoutedEventArgs e) => Settings.Instance.colorer = (ushort)((sender as MenuItem).Tag);
+                ContextMenuColorer.Items.Add(menuItem);
+            }
+
         }
 
         private void Fractal_MouseDown(object sender, MouseButtonEventArgs e)
@@ -66,7 +109,7 @@ namespace Fractal_Designer
             var timesSmaller = bitmapSourceResult.timesSmaller;
 
             int re = (int)(MouseLastMove.X * bitmapSourceResult.results.GetLength(0) / Fractal.ActualWidth);
-            int im =/* bitmapSourceResult.bitmap.PixelHeight -*/ (int)(MouseLastMove.Y * bitmapSourceResult.results.GetLength(1) / Fractal.ActualHeight);
+            int im = (int)(MouseLastMove.Y * bitmapSourceResult.results.GetLength(1) / Fractal.ActualHeight);
 
             if (bitmapSourceResult.results == null)
                 return;
@@ -155,5 +198,6 @@ namespace Fractal_Designer
 
         private void StackPanel_MouseDown(object sender, MouseButtonEventArgs e) => DragMove();
 
+        private void ResetSettings(object sender, RoutedEventArgs e) => Settings.Reset();
     }
 }
