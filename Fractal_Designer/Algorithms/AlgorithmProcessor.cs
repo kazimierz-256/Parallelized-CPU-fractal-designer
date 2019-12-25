@@ -20,7 +20,7 @@ namespace Fractal_Designer
 
         public void GetBitmapSourceFromComplexGrid(Complex center, double radius, int width, int height, ulong taskID, Action<BitmapSourceResult> performUpdate, CancellationToken token = new CancellationToken())
         {
-            Colorer colorer = GetColorer(Settings.Instance.colorer);
+            IColorer colorer = GetColorer(Settings.Instance.colorer);
             PixelFormat pixelFormat = PixelFormats.Bgr32;
             var results = new AlgorithmResult[width, height];
 
@@ -160,9 +160,9 @@ namespace Fractal_Designer
 
         }
 
-        private Colorer GetColorer(ushort colorer)
+        private IColorer GetColorer(ushort colorer)
         {
-            switch ((Colorer) colorer)
+            switch ((Colorer)colorer)
             {
                 case Colorer.Root_phase:
                     return new RootPhaseColorer();
@@ -189,7 +189,7 @@ namespace Fractal_Designer
         }
 
 
-        public class RootPhaseColorer : Colorer
+        public class RootPhaseColorer : IColorer
         {
             static double eps10 = Math.Pow(2, -10);
             public override (byte R, byte G, byte B) Color(AlgorithmResult result)
@@ -204,12 +204,26 @@ namespace Fractal_Designer
             }
         }
 
-        public class IterationsColorer : Colorer
+        public class IterationsColorer : IColorer
         {
+            static double eps10 = Math.Pow(2, -10);
             public override (byte R, byte G, byte B) Color(AlgorithmResult result)
             {
+                double abs = result.z.Magnitude;
                 double iter = Math.Pow(result.iterations, 1.4);
-                return ((byte)(255d * 10d / (10d + iter)), (byte)(255d * 70d / (70d + iter)), (byte)(255d * 300d / (300d + iter)));
+                var t = 1 - (.5 * eps10 / (eps10 + abs * abs));
+                var tmp = (
+                    (byte)(255d * 10d / (10d + iter) * t + 255 * (1 - t)),
+                    (byte)(255d * 70d / (70d + iter) * t + 255 * (1 - t)),
+                    (byte)(255d * 300d / (300d + iter) * t + 255 * (1 - t))
+                    );
+
+                //if (result.iterations >= 15)
+                //{
+                //    tmp = ((byte)(tmp.R / (result.iterations - 15)), (byte)(tmp.G / (result.iterations - 15)), (byte)(tmp.B / (result.iterations - 15)));
+                //}
+
+                return tmp;
             }
         }
 

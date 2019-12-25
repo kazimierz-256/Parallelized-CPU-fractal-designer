@@ -50,7 +50,7 @@ namespace Fractal_Designer
         AlgorithmResult result;
     }
 
-    public abstract class Colorer
+    public abstract class IColorer
     {
         public abstract (byte R, byte G, byte B) Color(AlgorithmResult result);
     }
